@@ -1,0 +1,51 @@
+{
+  "numero": "2026-002",
+  "tipo": "ordinaria",
+  "fecha": "2026-10-10",
+  "vence": "2026-11-09",
+  "cliente": "northwind",
+  "proyecto": "northwind-sistema",
+  "hito": "Sistema de diseño",
+  "emisor": {
+    "nombre": "Lucía Ferrer",
+    "nif": "00000000T",
+    "direccion": "Calle del Ejemplo, 1",
+    "cp": "46001",
+    "ciudad": "Valencia",
+    "provincia": "Valencia",
+    "pais": "ES",
+    "email": "hola@example.com"
+  },
+  "receptor": {
+    "razon_social": "Northwind Software GmbH",
+    "nif": "DE000000000",
+    "direccion": "Beispielstraße 7",
+    "cp": "10115",
+    "ciudad": "Berlín",
+    "provincia": "",
+    "pais": "DE",
+    "tipo": "empresa"
+  },
+  "conceptos": [
+    {
+      "descripcion": "Design system: tokens, components and documentation",
+      "cantidad": 1.0,
+      "precio": 6000.0,
+      "importe": 6000.0
+    }
+  ],
+  "base": 6000.0,
+  "iva_pct": 0.0,
+  "iva": 0.0,
+  "irpf_pct": 0.0,
+  "irpf": 0.0,
+  "total": 6000.0,
+  "mencion": "Inversión del sujeto pasivo (art. 84.Uno.2º y 69.Uno.1º Ley 37/1992)",
+  "pago": {
+    "forma": "Transferencia bancaria",
+    "iban": "ES00 0000 0000 0000 0000 0000"
+  },
+  "notas": "",
+  "estado": "cobrada",
+  "cobrada": "2026-10-24"
+}

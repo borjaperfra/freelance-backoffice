@@ -1,0 +1,19 @@
+{
+  "proveedor": "Tienda de Informática S.L.",
+  "nif_proveedor": "B11111111",
+  "concepto": "Monitor 27\" para el estudio",
+  "categoria": "equipo",
+  "tipo_iva": "nacional",
+  "base": 349.0,
+  "fecha": "2026-10-18",
+  "numero_factura": "TI-2026-5531",
+  "iva_pct": 21.0,
+  "iva": 73.29,
+  "total": 422.29,
+  "afectacion": 100.0,
+  "iva_deducible": 73.29,
+  "iva_autoliquidado": 0.0,
+  "gasto_irpf": 0.0,
+  "amortizable": 349.0,
+  "archivo": "2026-10-18-tienda-de-informatica-s-l.pdf"
+}

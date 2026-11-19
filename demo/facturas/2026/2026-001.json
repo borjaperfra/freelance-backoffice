@@ -1,0 +1,51 @@
+{
+  "numero": "2026-001",
+  "tipo": "ordinaria",
+  "fecha": "2026-09-30",
+  "vence": "2026-10-30",
+  "cliente": "acme-robotica",
+  "proyecto": "acme-robotica-web",
+  "hito": "Fase 1",
+  "emisor": {
+    "nombre": "Lucía Ferrer",
+    "nif": "00000000T",
+    "direccion": "Calle del Ejemplo, 1",
+    "cp": "46001",
+    "ciudad": "Valencia",
+    "provincia": "Valencia",
+    "pais": "ES",
+    "email": "hola@example.com"
+  },
+  "receptor": {
+    "razon_social": "Acme Robótica S.L.",
+    "nif": "B00000000",
+    "direccion": "Avenida de la Demo, 42",
+    "cp": "46022",
+    "ciudad": "Valencia",
+    "provincia": "Valencia",
+    "pais": "ES",
+    "tipo": "empresa"
+  },
+  "conceptos": [
+    {
+      "descripcion": "Fase 1: descubrimiento, entrevistas y arquitectura de la web",
+      "cantidad": 1.0,
+      "precio": 3000.0,
+      "importe": 3000.0
+    }
+  ],
+  "base": 3000.0,
+  "iva_pct": 21.0,
+  "iva": 630.0,
+  "irpf_pct": 7.0,
+  "irpf": 210.0,
+  "total": 3420.0,
+  "mencion": null,
+  "pago": {
+    "forma": "Transferencia bancaria",
+    "iban": "ES00 0000 0000 0000 0000 0000"
+  },
+  "notas": "",
+  "estado": "cobrada",
+  "cobrada": "2026-10-21"
+}

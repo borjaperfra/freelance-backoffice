@@ -1,0 +1,37 @@
+[
+  {
+    "id": "cuota-autonomos",
+    "proveedor": "Seguridad Social",
+    "concepto": "Cuota de autónomos",
+    "categoria": "seguridad_social",
+    "tipo_iva": "sin_iva",
+    "base": 87.61,
+    "desde": "2026-09",
+    "sin_factura": true
+  },
+  {
+    "id": "adobe",
+    "proveedor": "Adobe Systems Software Ireland",
+    "pais": "IE",
+    "concepto": "Creative Cloud",
+    "categoria": "software",
+    "tipo_iva": "isp_ue",
+    "base": 60.49,
+    "dia": 5,
+    "desde": "2026-09",
+    "banco": [
+      "Adobe"
+    ]
+  },
+  {
+    "id": "fibra",
+    "proveedor": "Fibra de Ejemplo S.A.",
+    "concepto": "Fibra y móvil",
+    "categoria": "telefono",
+    "tipo_iva": "nacional",
+    "base": 33.06,
+    "afectacion": 50,
+    "dia": 12,
+    "desde": "2026-09"
+  }
+]

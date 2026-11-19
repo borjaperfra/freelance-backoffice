@@ -1,0 +1,23 @@
+{
+  "nombre": "Acme Robótica",
+  "razon_social": "Acme Robótica S.L.",
+  "nif": "B00000000",
+  "direccion": "Avenida de la Demo, 42",
+  "cp": "46022",
+  "ciudad": "Valencia",
+  "provincia": "Valencia",
+  "pais": "ES",
+  "tipo": "empresa",
+  "estado": "activo",
+  "email_facturas": "facturas@acme.example",
+  "contactos": [
+    {
+      "nombre": "Ana Ríos",
+      "rol": "Directora de marketing",
+      "email": "ana@acme.example",
+      "telefono": ""
+    }
+  ],
+  "desde": "2026-09",
+  "notas": "Llegaron por una recomendación. Quieren la web nueva antes de la feria de marzo."
+}

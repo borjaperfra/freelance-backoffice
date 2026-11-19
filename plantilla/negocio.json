@@ -1,0 +1,19 @@
+{
+  "nombre": "PENDIENTE",
+  "nif": "PENDIENTE",
+  "direccion": "PENDIENTE",
+  "cp": "PENDIENTE",
+  "ciudad": "PENDIENTE",
+  "provincia": "",
+  "pais": "ES",
+  "email": "PENDIENTE",
+  "iban": "PENDIENTE",
+  "alta": "",
+  "iva": 21,
+  "irpf": 15,
+  "irpf_hasta": "",
+  "vence_dias": 30,
+  "dominio": "",
+  "gestoria": { "nombre": "", "email": "" },
+  "notas": ""
+}

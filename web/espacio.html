@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Espacio privado de cliente: solo se abre con enlace personal (functions/c/_middleware.js). Lo genera trastienda.py. -->
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>{{TITULO}} · {{MARCA}}</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='12' fill='none' stroke='%23000' stroke-width='2.5'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #ffffff; --fg: #0a0a0a; --muted: rgba(10, 10, 10, .6); --line: rgba(10, 10, 10, .16); --soft: rgba(10, 10, 10, .05);
+  --ok: #15803d; --warn: #c2410c; --x: clamp(16px, 4vw, 48px);
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0a0a0a; --fg: #f2f2f2; --muted: rgba(242, 242, 242, .6); --line: rgba(242, 242, 242, .16); --soft: rgba(242, 242, 242, .06);
+          --ok: #4ade80; --warn: #fb923c; }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { background: var(--bg); color: var(--fg); font: 18px/1.6 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
+a { color: inherit; }
+
+.top { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; gap: 16px;
+       height: 56px; padding: 0 var(--x); background: var(--bg); border-bottom: 1px solid var(--line); font-size: 15px; white-space: nowrap; }
+.marca { display: flex; align-items: center; gap: 8px; font-weight: 500; text-decoration: none; overflow: hidden; text-overflow: ellipsis; }
+.marca i { flex: none; width: 12px; height: 12px; border: 1.6px solid var(--fg); border-radius: 50%; }
+.top a.mail { text-decoration: none; }
+.top a.mail:hover { opacity: .6; }
+
+main { max-width: calc(46 * 18px); margin: 0 auto; padding: 0 var(--x) 96px; }
+.hero { padding: clamp(48px, 10vh, 112px) 0 clamp(32px, 6vh, 64px); border-bottom: 1px solid var(--line); }
+.hero .sub { font-size: 15px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 20px; margin-bottom: clamp(24px, 5vh, 48px); }
+.hero h1 { font-size: clamp(40px, 7vw, 88px); font-weight: 400; letter-spacing: -.04em; line-height: 1; }
+
+.indice { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+.indice a { font-size: 14px; text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+.indice a:hover { border-color: var(--fg); }
+
+.texto { padding-top: clamp(32px, 6vh, 56px); }
+.texto > * + *, .bloque > * + * { margin-top: 1.1em; }
+h2 { font-size: clamp(28px, 3.2vw, 40px); font-weight: 400; letter-spacing: -.025em; line-height: 1.1; padding-top: clamp(40px, 7vh, 72px); }
+.texto > h2:first-child { padding-top: 0; }
+h3 { font-size: 22px; font-weight: 500; letter-spacing: -.015em; line-height: 1.3; margin-top: 1.8em !important; }
+h4 { font-size: 18px; font-weight: 600; margin-top: 1.6em !important; }
+strong { font-weight: 600; }
+p a, li a, td a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .15em; overflow-wrap: anywhere; }
+ul, ol { padding-left: 1.3em; }
+li + li { margin-top: .35em; }
+li::marker { color: var(--muted); }
+blockquote { border-left: 2px solid var(--fg); padding: 2px 0 2px 20px; }
+code { font: .88em ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--soft); border-radius: 4px; padding: .1em .35em; }
+pre { background: var(--soft); border-radius: 10px; padding: 16px 18px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2.4em 0 !important; }
+img { max-width: 100%; height: auto; border-radius: 10px; }
+
+.tabla { overflow-x: auto; border-top: 1px solid var(--fg); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; line-height: 1.45; }
+th { text-align: left; font-weight: 500; padding: 10px 14px 10px 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 10px 14px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th.n, td.n { text-align: right; padding-right: 0; padding-left: 14px; white-space: nowrap; }
+.estado { font-size: 13px; font-weight: 500; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+.estado.hecho, .estado.cobrado, .estado.cobrada { color: var(--ok); border-color: currentColor; }
+.estado.emitida { color: var(--warn); border-color: currentColor; }
+
+.archivos { list-style: none; padding: 0; border-top: 1px solid var(--fg); }
+.archivos li { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--line); margin: 0; font-size: 15px; }
+.archivos span { color: var(--muted); white-space: nowrap; }
+
+.cierre { margin-top: clamp(48px, 8vh, 80px); padding: clamp(22px, 3.5vw, 36px); border: 1px solid var(--fg); border-radius: 18px; }
+.cierre h2 { padding-top: 0; }
+.boton { display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px; border-radius: 999px; background: var(--fg); color: var(--bg);
+         font-size: 15px; font-weight: 500; text-decoration: none !important; }
+.boton:hover { opacity: .8; }
+
+footer { max-width: calc(46 * 18px); margin: 0 auto; padding: 24px var(--x) 48px; border-top: 1px solid var(--line); font-size: 14px; color: var(--muted);
+         display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; }
+@media print { .top { position: static; } .indice, .boton { display: none; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="marca"><i></i>{{MARCA}}</span>
+  <a class="mail" href="mailto:{{EMAIL}}">{{EMAIL}}</a>
+</header>
+<main>
+  <section class="hero">
+    <p class="sub"><span>{{SUBTITULO}}</span><span>{{FECHA}}</span></p>
+    <h1>{{TITULO}}</h1>
+    {{INDICE}}
+  </section>
+  <article class="texto">
+{{CUERPO}}
+  </article>
+</main>
+<footer>
+  <span>Enlace personal: por favor, no lo reenvíes.</span>
+  <span>{{MARCA}}</span>
+</footer>
+<script>
+  // Los enlaces de fuera, en otra pestaña
+  document.querySelectorAll('a[href^="http"]').forEach(function (a) {
+    if (a.host !== location.host) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+  });
+</script>
+</body>
+</html>

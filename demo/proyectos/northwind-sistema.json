@@ -1,0 +1,18 @@
+{
+  "nombre": "Sistema de diseño",
+  "cliente": "northwind",
+  "estado": "terminado",
+  "inicio": "2026-09-08",
+  "fin": "2026-10-10",
+  "precio": 6000,
+  "hitos": [
+    {
+      "nombre": "Sistema de diseño",
+      "fecha": "2026-10-10",
+      "importe": 6000,
+      "estado": "cobrado",
+      "factura": "2026-002"
+    }
+  ],
+  "notas": ""
+}

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Trimestre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Resumen del trimestre para la gestoría (A4). Lo imprime admin.py: trimestre.html?t=2026-4T */
+  @page { size: A4; margin: 16mm 16mm 14mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: #e5e5e5; }
+  body {
+    width: 210mm; margin: 0 auto; padding: 16mm; background: #fff; color: #0a0a0a;
+    font: 9pt/1.45 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums;
+  }
+  @media print { html { background: #fff; } body { width: auto; padding: 0; } }
+  .marca { display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 10.5pt; }
+  .marca i { width: 11px; height: 11px; border: 1.5px solid #0a0a0a; border-radius: 50%; }
+  h1 { font-size: 28pt; font-weight: 400; letter-spacing: -.02em; line-height: 1; margin: 12mm 0 3mm; }
+  .sub { color: rgba(10,10,10,.6); }
+  .cifras { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 8mm; border-top: 1px solid #0a0a0a; }
+  .cifras div { padding: 3mm 0; border-bottom: 1px solid rgba(10,10,10,.15); }
+  .cifras b { display: block; font-size: 18pt; font-weight: 400; }
+  .cifras span { color: rgba(10,10,10,.6); font-size: 8pt; }
+  h2 { break-after: avoid; font-size: 7.5pt; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; margin: 9mm 0 2mm; }
+  table { width: 100%; border-collapse: collapse; border-top: 1px solid #0a0a0a; break-inside: auto; }
+  tr { break-inside: avoid; }
+  th { text-align: left; font-weight: 400; font-size: 7.5pt; color: rgba(10,10,10,.55); padding: 1.6mm 3mm 1.6mm 0; border-bottom: 1px solid rgba(10,10,10,.15); }
+  td { padding: 1.6mm 3mm 1.6mm 0; border-bottom: 1px solid rgba(10,10,10,.15); vertical-align: top; }
+  .n { text-align: right; white-space: nowrap; padding-left: 3mm; padding-right: 0; }
+  .nw { white-space: nowrap; }
+  .c { color: rgba(10,10,10,.55); width: 14mm; }
+  tr.total td { font-weight: 500; }
+  .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
+  ul { margin-left: 4mm; }
+  li + li { margin-top: 1mm; }
+  .pie { margin-top: 10mm; color: rgba(10,10,10,.55); font-size: 7.5pt; }
+</style>
+</head>
+<body>
+<script>
+(function () {
+  var t = new URLSearchParams(location.search).get('t');
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  };
+  var eur = function (x) { return (x || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' }) + ' €'; };
+  var MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  var fecha = function (iso) { var p = iso.split('-'); return +p[2] + ' de ' + MESES[+p[1] - 1] + ' de ' + p[0]; };
+  var corta = function (iso) { var p = iso.split('-'); return p[2] + '/' + p[1]; };
+
+  fetch('datos.json').then(function (r) { return r.json(); }).then(function (D) {
+    var r = D.trimestres.filter(function (x) { return x.trimestre === t; })[0];
+    if (!r) { document.body.textContent = 'No hay datos del ' + t; return; }
+    var neg = D.negocio, m = r.m303, n = r.m130;
+    var fa = function (num) { return D.facturas.filter(function (f) { return f.numero === num; })[0]; };
+    var ga = function (id) { return D.gastos.filter(function (g) { return g.id === id; })[0]; };
+    var casillas = function (filas) {
+      return '<table><tbody>' + filas.map(function (f) {
+        return '<tr' + (f[3] ? ' class="total"' : '') + '><td class="c">' + f[0] + '</td><td>' + f[1] + '</td><td class="n">' + eur(f[2]) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+    };
+    document.title = 'Trimestre ' + t + ' · ' + neg.nombre;
+
+    var h = '<div class="marca"><i></i>' + esc(neg.nombre) + ' · NIF ' + esc(neg.nif) + '</div>';
+    h += '<h1>Trimestre ' + esc(t) + '</h1>';
+    h += '<p class="sub">Del ' + fecha(r.desde) + ' al ' + fecha(r.hasta) + '. Plazo de presentación: hasta el ' + fecha(r.plazo) +
+      '. Estimación directa simplificada, IVA régimen general. Generado el ' + fecha(D.generado.slice(0, 10)) + '.</p>';
+    h += '<div class="cifras"><div><b>' + eur(m['46']) + '</b><span>Modelo 303 · resultado (46)</span></div>' +
+      '<div><b>' + eur(n['07']) + '</b><span>Modelo 130 · resultado (07)</span></div>' +
+      '<div><b>' + eur(r.a_pagar) + '</b><span>Total estimado a ingresar</span></div></div>';
+
+    h += '<div class="dos"><div><h2>Modelo 303 · IVA</h2>' + casillas([
+      ['07', 'Base imponible al 21%', m['07']], ['09', 'Cuota al 21%', m['09']],
+      ['10', 'Adq. intracomunitarias servicios: base', m['10']], ['11', '… cuota', m['11']],
+      ['12', 'Otras operaciones con ISP: base', m['12']], ['13', '… cuota', m['13']],
+      ['14', 'Modificación de bases', m['14']], ['15', '… cuotas', m['15']],
+      ['27', 'Total cuota devengada', m['27'], 1],
+      ['28', 'Op. interiores corrientes: base', m['28']], ['29', '… cuota', m['29']],
+      ['36', 'Adq. intracomunitarias: base', m['36']], ['37', '… cuota', m['37']],
+      ['45', 'Total a deducir', m['45'], 1], ['46', 'Resultado régimen general', m['46'], 1],
+      ['59', 'Entregas intracomunitarias de servicios', m['59']],
+      ['120', 'No sujetas por reglas de localización', m['120']]
+    ]) + '</div><div><h2>Modelo 130 · IRPF (acumulado del año)</h2>' + casillas([
+      ['01', 'Ingresos computables', n['01']], ['02', 'Gastos fiscalmente deducibles', n['02']],
+      ['03', 'Rendimiento neto', n['03'], 1], ['04', '20% de la casilla 03', n['04']],
+      ['05', 'Pagos fraccionados anteriores', n['05']], ['06', 'Retenciones e ingresos a cuenta', n['06']],
+      ['07', 'Resultado', n['07'], 1]
+    ]);
+    h += '<h2>A revisar</h2><ul>' + r.avisos.map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('') + '</ul></div></div>';
+
+    h += '<h2>Facturas emitidas (' + r.facturas.length + ')</h2><table><thead><tr><th>Fecha</th><th>Número</th><th>Cliente</th><th>NIF</th>' +
+      '<th class="n">Base</th><th class="n">IVA</th><th class="n">IRPF</th><th class="n">Total</th></tr></thead><tbody>' +
+      (r.facturas.map(function (num) {
+        var f = fa(num);
+        return '<tr><td>' + corta(f.fecha) + '</td><td class="nw">' + esc(num) + '</td><td>' + esc(f.receptor.razon_social) + '</td><td>' + esc(f.receptor.nif) +
+          '</td><td class="n">' + eur(f.base) + '</td><td class="n">' + eur(f.iva) + '</td><td class="n">' + eur(f.irpf) + '</td><td class="n">' + eur(f.total) + '</td></tr>';
+      }).join('') || '<tr><td colspan="8">Ninguna</td></tr>') + '</tbody></table>';
+
+    h += '<h2>Facturas recibidas y gastos (' + r.gastos.length + ')</h2><table><thead><tr><th>Fecha</th><th>Proveedor</th><th>Concepto</th><th>IVA</th>' +
+      '<th class="n">Base</th><th class="n">IVA ded.</th><th class="n">Gasto IRPF</th></tr></thead><tbody>' +
+      (r.gastos.map(function (id) {
+        var g = ga(id);
+        var tipo = { nacional: 'Nacional', ticket: 'Ticket', isp_ue: 'ISP UE', isp_fuera: 'ISP fuera UE', sin_iva: 'Sin IVA' }[g.tipo_iva];
+        return '<tr><td>' + corta(g.fecha) + '</td><td>' + esc(g.proveedor) + '</td><td>' + esc(g.concepto) +
+          (g.afectacion < 100 ? ' (' + g.afectacion + '%)' : '') + (g.amortizable ? ' · por amortizar' : '') + '</td><td>' + tipo +
+          '</td><td class="n">' + eur(g.base) + '</td><td class="n">' + eur(g.iva_deducible) + '</td><td class="n">' + eur(g.gasto_irpf) + '</td></tr>';
+      }).join('') || '<tr><td colspan="7">Ninguno</td></tr>') + '</tbody></table>';
+
+    h += '<p class="pie">Cifras calculadas a partir de las facturas emitidas y recibidas registradas. Es una propuesta para revisar antes de presentar. ' +
+      'Las facturas van en el ZIP adjunto (facturas-emitidas/ y facturas-recibidas/) y el detalle completo, en el Excel de libros.</p>';
+    document.body.innerHTML = h;
+  });
+})();
+</script>
+</body>
+</html>

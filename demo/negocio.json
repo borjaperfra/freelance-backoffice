@@ -1,0 +1,22 @@
+{
+  "nombre": "Lucía Ferrer",
+  "nif": "00000000T",
+  "direccion": "Calle del Ejemplo, 1",
+  "cp": "46001",
+  "ciudad": "Valencia",
+  "provincia": "Valencia",
+  "pais": "ES",
+  "email": "hola@example.com",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "alta": "2026-09-01",
+  "iva": 21,
+  "irpf": 7,
+  "irpf_hasta": "2028-12-31",
+  "vence_dias": 30,
+  "dominio": "https://demo.trastienda.example",
+  "gestoria": {
+    "nombre": "Gestoría de Ejemplo",
+    "email": "gestoria@example.com"
+  },
+  "notas": "Datos inventados para la demo."
+}

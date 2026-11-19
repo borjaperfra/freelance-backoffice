@@ -1,0 +1,60 @@
+{
+  "nombre": "Web nueva",
+  "cliente": "acme-robotica",
+  "estado": "activo",
+  "inicio": "2026-09-01",
+  "fin": "2026-12-20",
+  "precio": 9000,
+  "hitos": [
+    {
+      "nombre": "Fase 1",
+      "fecha": "2026-09-30",
+      "importe": 3000,
+      "estado": "cobrado",
+      "factura": "2026-001"
+    },
+    {
+      "nombre": "Fase 2",
+      "fecha": "2026-11-15",
+      "importe": 3500,
+      "estado": "facturado",
+      "factura": "2026-003"
+    },
+    {
+      "nombre": "Fase 3",
+      "fecha": "2026-12-20",
+      "importe": 2500,
+      "estado": "pendiente",
+      "factura": null
+    }
+  ],
+  "tareas": [
+    {
+      "texto": "Mandar los textos de la home a Ana",
+      "hecha": false
+    },
+    {
+      "texto": "Revisar accesibilidad del prototipo",
+      "hecha": true
+    }
+  ],
+  "horas": [
+    {
+      "fecha": "2026-11-03",
+      "horas": 4,
+      "nota": "Prototipo de la home"
+    },
+    {
+      "fecha": "2026-11-10",
+      "horas": 3.5,
+      "nota": "Revisión con Ana"
+    },
+    {
+      "fecha": "2026-11-17",
+      "horas": 5,
+      "nota": "Componentes"
+    }
+  ],
+  "horas_semana": 10,
+  "notas": "Fase 1: descubrimiento. Fase 2: diseño. Fase 3: desarrollo y lanzamiento."
+}

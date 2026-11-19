@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Factura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* La factura que se imprime en PDF (A4). La pinta admin.py con Chrome: factura.html?n=2026-001 */
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: #e5e5e5; }
+  body {
+    width: 210mm; min-height: 297mm; margin: 0 auto; padding: 18mm 18mm 16mm;
+    background: #fff; color: #0a0a0a;
+    font: 9.5pt/1.45 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums;
+    display: flex; flex-direction: column;
+  }
+  @media print { html { background: #fff; } body { margin: 0; } }
+
+  .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .marca { display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 11pt; }
+  .marca i { width: 12px; height: 12px; border: 1.6px solid #0a0a0a; border-radius: 50%; }
+  h1 { font-size: 34pt; font-weight: 400; letter-spacing: -.02em; line-height: 1; margin: 22mm 0 4mm; }
+  .datos { display: flex; flex-wrap: wrap; gap: 2mm 10mm; white-space: nowrap; color: rgba(10,10,10,.6); }
+  .datos b { color: #0a0a0a; font-weight: 400; }
+
+  .partes { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm; margin-top: 12mm; padding-top: 3mm; border-top: 1px solid #0a0a0a; }
+  .partes h2, .pie h2 { font-size: 7.5pt; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: rgba(10,10,10,.55); margin-bottom: 2mm; }
+  .partes p { white-space: pre-line; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 12mm; }
+  th { text-align: left; font-weight: 400; font-size: 8pt; color: rgba(10,10,10,.55); padding: 0 0 2mm; border-bottom: 1px solid #0a0a0a; }
+  td { padding: 3mm 0; border-bottom: 1px solid rgba(10,10,10,.15); vertical-align: top; }
+  .n { text-align: right; white-space: nowrap; padding-left: 6mm; }
+  td:first-child { padding-right: 6mm; }
+
+  .totales { margin: 6mm 0 0 auto; width: 80mm; }
+  .totales div { display: flex; justify-content: space-between; padding: 1.6mm 0; border-bottom: 1px solid rgba(10,10,10,.15); }
+  .totales .total { border-bottom: 0; border-top: 1px solid #0a0a0a; margin-top: 1mm; padding-top: 3mm; font-size: 14pt; }
+
+  .pie { margin-top: auto; padding-top: 10mm; display: grid; grid-template-columns: 1fr 1fr; gap: 10mm; }
+  .legal { grid-column: 1 / -1; color: rgba(10,10,10,.6); font-size: 8pt; border-top: 1px solid rgba(10,10,10,.15); padding-top: 3mm; }
+  .legal p + p { margin-top: 1mm; }
+  .error { padding: 20mm; font-size: 14pt; }
+</style>
+</head>
+<body>
+<script>
+(function () {
+  var n = new URLSearchParams(location.search).get('n');
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  };
+  var eur = function (x) { return (x || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' }) + ' €'; };
+  var num = function (x) { return x.toLocaleString('es-ES', { maximumFractionDigits: 2 }); };
+  var MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  var fecha = function (iso) { var p = iso.split('-'); return +p[2] + ' de ' + MESES[+p[1] - 1] + ' de ' + p[0]; };
+  var bloque = function (x) {
+    return [x.razon_social || x.nombre, 'NIF ' + x.nif, x.direccion, [x.cp, x.ciudad].filter(Boolean).join(' ') +
+      (x.provincia && x.provincia !== x.ciudad ? ' (' + x.provincia + ')' : ''), x.pais !== 'ES' ? x.pais : ''].filter(Boolean).map(esc).join('\n');
+  };
+
+  fetch('datos.json').then(function (r) { return r.json(); }).then(function (d) {
+    var f = d.facturas.filter(function (x) { return x.numero === n; })[0];
+    if (!f) { document.body.innerHTML = '<p class="error">No existe la factura ' + esc(n) + '</p>'; return; }
+    var rect = f.tipo === 'rectificativa';
+    document.title = (rect ? 'Factura rectificativa ' : 'Factura ') + f.numero + ' · ' + f.emisor.nombre;
+
+    var html = '<div class="top"><div class="marca"><i></i>' + esc(f.emisor.nombre) + '</div><div>' + esc(f.emisor.email) + '</div></div>';
+    html += '<h1>' + (rect ? 'Factura rectificativa' : 'Factura') + '</h1>';
+    html += '<div class="datos"><span>Número <b>' + esc(f.numero) + '</b></span><span>Fecha <b>' + fecha(f.fecha) + '</b></span>' +
+      (rect ? '<span>Rectifica <b>' + esc(f.rectifica) + '</b> del ' + fecha(f.fecha_rectificada) + '</span>' : '<span>Vence <b>' + fecha(f.vence) + '</b></span>') + '</div>';
+    html += '<div class="partes"><div><h2>De</h2><p>' + bloque(f.emisor) + '</p></div><div><h2>Para</h2><p>' + bloque(f.receptor) + '</p></div></div>';
+
+    html += '<table><thead><tr><th>Concepto</th><th class="n">Cantidad</th><th class="n">Precio</th><th class="n">Importe</th></tr></thead><tbody>' +
+      f.conceptos.map(function (c) {
+        return '<tr><td>' + esc(c.descripcion) + '</td><td class="n">' + num(c.cantidad) + '</td><td class="n">' + eur(c.precio) + '</td><td class="n">' + eur(c.importe) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+
+    html += '<div class="totales"><div><span>Base imponible</span><span>' + eur(f.base) + '</span></div>' +
+      '<div><span>IVA ' + num(f.iva_pct) + '%</span><span>' + eur(f.iva) + '</span></div>' +
+      (f.irpf_pct ? '<div><span>Retención IRPF ' + num(f.irpf_pct) + '%</span><span>' + eur(-f.irpf) + '</span></div>' : '') +
+      '<div class="total"><span>Total</span><span>' + eur(f.total) + '</span></div></div>';
+
+    html += '<div class="pie">';
+    if (!rect) html += '<div><h2>Forma de pago</h2><p>' + esc(f.pago.forma) + '<br>IBAN ' + esc(f.pago.iban) + '</p></div>';
+    if (f.notas) html += '<div><h2>Notas</h2><p>' + esc(f.notas) + '</p></div>';
+    var legal = [];
+    if (f.mencion) legal.push(f.mencion);
+    if (rect) legal.push('Factura rectificativa emitida conforme al art. 15 del Real Decreto 1619/2012. Motivo: ' + f.motivo);
+    if (legal.length) html += '<div class="legal">' + legal.map(function (l) { return '<p>' + esc(l) + '</p>'; }).join('') + '</div>';
+    html += '</div>';
+    document.body.innerHTML = html;
+  });
+})();
+</script>
+</body>
+</html>

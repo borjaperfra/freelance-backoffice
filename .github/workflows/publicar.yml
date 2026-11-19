@@ -1,0 +1,68 @@
+# Publica el admin y los espacios de cliente en Cloudflare Pages cada vez que se sube algo a main.
+#
+# Necesita dos secretos en GitHub (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   token con permiso "Cloudflare Pages: Edit"
+#   CLOUDFLARE_ACCOUNT_ID  el ID de la cuenta de Cloudflare
+# Ver docs/instalar.md. Sin datos/negocio.json (la plantilla recién creada), no hace nada.
+
+name: Publicar
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+env:
+  PROYECTO: trastienda   # el mismo name que en wrangler.toml
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ¿Hay datos?
+        id: datos
+        run: |
+          if [ -f datos/negocio.json ]; then echo "hay=1" >> "$GITHUB_OUTPUT"; else echo "Aún no hay datos/negocio.json: no se publica nada."; fi
+
+      - uses: actions/setup-python@v5
+        if: steps.datos.outputs.hay == '1'
+        with:
+          python-version: '3.12'
+
+      - name: Revisar los datos
+        if: steps.datos.outputs.hay == '1'
+        run: python trastienda.py revisar
+
+      # Las facturas llevan su PDF en el repo; aquí no se genera ninguno.
+      - name: Montar el sitio
+        if: steps.datos.outputs.hay == '1'
+        run: python trastienda.py build
+
+      # La primera vez crea el proyecto de Pages; las demás falla porque ya existe, y da igual.
+      - name: Crear el proyecto de Pages
+        if: steps.datos.outputs.hay == '1'
+        continue-on-error: true
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '3.114.0'
+          command: pages project create ${{ env.PROYECTO }} --production-branch=main
+
+      - name: Desplegar
+        if: steps.datos.outputs.hay == '1'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '3.114.0'
+          command: pages deploy --project-name=${{ env.PROYECTO }} --branch=main --commit-hash=${{ github.sha }}

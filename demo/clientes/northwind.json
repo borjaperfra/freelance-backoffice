@@ -1,0 +1,23 @@
+{
+  "nombre": "Northwind",
+  "razon_social": "Northwind Software GmbH",
+  "nif": "DE000000000",
+  "direccion": "Beispielstraße 7",
+  "cp": "10115",
+  "ciudad": "Berlín",
+  "provincia": "",
+  "pais": "DE",
+  "tipo": "empresa",
+  "estado": "cerrado",
+  "email_facturas": "invoices@northwind.example",
+  "contactos": [
+    {
+      "nombre": "Jonas Weber",
+      "rol": "Head of Product",
+      "email": "jonas@northwind.example",
+      "telefono": ""
+    }
+  ],
+  "desde": "2026-09",
+  "notas": ""
+}

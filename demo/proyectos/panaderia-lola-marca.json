@@ -1,0 +1,27 @@
+{
+  "nombre": "Marca nueva",
+  "cliente": "panaderia-lola",
+  "estado": "propuesta",
+  "inicio": "2027-01-11",
+  "fin": "2027-03-05",
+  "precio": 2400,
+  "enviada": "2026-11-09",
+  "seguimiento_dias": 7,
+  "hitos": [
+    {
+      "nombre": "Estrategia y naming",
+      "fecha": "2027-01-29",
+      "importe": 900,
+      "estado": "pendiente",
+      "factura": null
+    },
+    {
+      "nombre": "Identidad visual",
+      "fecha": "2027-03-05",
+      "importe": 1500,
+      "estado": "pendiente",
+      "factura": null
+    }
+  ],
+  "notas": ""
+}

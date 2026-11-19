@@ -1,0 +1,16 @@
+{
+  "acme-robotica-web": [
+    {
+      "nombre": "Ana Ríos (demo)",
+      "hash": "c7d45bd7720204b401cf5f39ba069ccb1b7d9c421feed260b625521e711b3d5a",
+      "creado": "2026-11-19"
+    }
+  ],
+  "panaderia-lola": [
+    {
+      "nombre": "Lola Martí (demo)",
+      "hash": "190eb9e2c76de91605c4ebf676fb3f2afcfa6294147043444955b69d9dcdf33c",
+      "creado": "2026-11-19"
+    }
+  ]
+}

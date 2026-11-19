@@ -1,0 +1,17 @@
+{
+  "proveedor": "Fibra de Ejemplo S.A.",
+  "concepto": "Fibra y móvil",
+  "categoria": "telefono",
+  "tipo_iva": "nacional",
+  "base": 33.06,
+  "afectacion": 50.0,
+  "fecha": "2026-11-12",
+  "recurrente": "fibra",
+  "iva_pct": 21.0,
+  "iva": 6.94,
+  "total": 40.0,
+  "iva_deducible": 3.47,
+  "iva_autoliquidado": 0.0,
+  "gasto_irpf": 16.53,
+  "amortizable": 0.0
+}

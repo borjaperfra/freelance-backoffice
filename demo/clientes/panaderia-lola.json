@@ -1,0 +1,23 @@
+{
+  "nombre": "Panadería Lola",
+  "razon_social": "PENDIENTE",
+  "nif": "PENDIENTE",
+  "direccion": "PENDIENTE",
+  "cp": "",
+  "ciudad": "Valencia",
+  "provincia": "Valencia",
+  "pais": "ES",
+  "tipo": "empresa",
+  "estado": "propuesta",
+  "email_facturas": "",
+  "contactos": [
+    {
+      "nombre": "Lola Martí",
+      "rol": "Dueña",
+      "email": "lola@panaderia.example",
+      "telefono": ""
+    }
+  ],
+  "desde": "2026-11",
+  "notas": "Tres locales. Quieren marca nueva para abrir el cuarto."
+}
