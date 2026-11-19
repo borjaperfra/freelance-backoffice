@@ -1,11 +1,11 @@
 ---
 name: factura
-description: Emite, cobra y rectifica las facturas de la persona (autónomo) desde su trastienda. Úsala cuando la persona diga que quiere facturar algo ("factura a Acme la Fase 0", "hazle una factura a X por 2.000 €"), que le han pagado ("me ha pagado X", "cobrada la 2026-003") o que una factura está mal y hay que anularla o rectificarla.
+description: Emite, cobra y rectifica las facturas de la persona (autónomo) desde su backoffice. Úsala cuando la persona diga que quiere facturar algo ("factura a Acme la Fase 0", "hazle una factura a X por 2.000 €"), que le han pagado ("me ha pagado X", "cobrada la 2026-003") o que una factura está mal y hay que anularla o rectificarla.
 ---
 
 # Facturas
 
-Todo pasa por `python trastienda.py` (desde la raíz del repo). El script pone el número, calcula el IVA y el IRPF según el cliente y genera el PDF. Los datos están explicados en `docs/datos.md`.
+Todo pasa por `python backoffice.py` (desde la raíz del repo). El script pone el número, calcula el IVA y el IRPF según el cliente y genera el PDF. Los datos están explicados en `docs/datos.md`.
 
 Habla con la persona en su idioma y corto.
 
@@ -35,7 +35,7 @@ Habla con la persona en su idioma y corto.
    ```
    `fecha` es hoy salvo que diga otra. `proyecto` y `hito` son opcionales: si van, el hito pasa a "facturado" solo. `vence_dias` es opcional (por defecto, el del cliente o 30).
 5. **Confirmación.** Enséñale en 4 o 5 líneas a quién, qué, la base, el IVA, el IRPF y el total. Para calcularlo sin emitir: el IVA es del 21% salvo para empresas de la UE y clientes de fuera de la UE (0%); se retiene el IRPF de `negocio.json` (15%, o 7% los primeros años) solo a empresas y autónomos de España.
-6. **Emitir.** `python trastienda.py emitir <borrador.json>`. Si falla por datos de `negocio.json` o del cliente, dile exactamente qué falta.
+6. **Emitir.** `python backoffice.py emitir <borrador.json>`. Si falla por datos de `negocio.json` o del cliente, dile exactamente qué falta.
 7. **Revisa el PDF** (`datos/facturas/<año>/<número>.pdf`): léelo y comprueba que el total y los datos del cliente cuadran.
 8. **Publica** (ver abajo). Si el script avisó de algo (cliente de la UE: VIES, ROI y modelo 349), díselo.
 9. **Déjale el email listo en Gmail** (ver "Mandar la factura"). Si el cliente no tiene `email_facturas`, pregúntale a quién va y guárdalo en su ficha.
@@ -63,22 +63,22 @@ Cuando una factura vence sin cobrar, sale en "Lo que falta". Si la persona dice 
 
 Si la persona quiere dejar una factura preparada sin emitirla todavía ("déjala en borrador", "prepárame la factura de X"), guarda el borrador en `datos/facturas/borradores/<cliente>-<algo>.json` (mismo formato que arriba, normalmente sin `fecha`) y publica. Sale en el admin, en Hoy y en Facturas, con los totales calculados y sin número.
 
-Para emitirlo ("emite el borrador de Northwind"): confirma igual que siempre y `python trastienda.py emitir datos/facturas/borradores/<archivo>.json`. Coge la fecha de hoy si no tiene, y el borrador se borra solo al emitir.
+Para emitirlo ("emite el borrador de Northwind"): confirma igual que siempre y `python backoffice.py emitir datos/facturas/borradores/<archivo>.json`. Coge la fecha de hoy si no tiene, y el borrador se borra solo al emitir.
 
 ## Cobrar
 
-`python trastienda.py cobrar <número> [AAAA-MM-DD]`. Sin fecha, hoy.
+`python backoffice.py cobrar <número> [AAAA-MM-DD]`. Sin fecha, hoy.
 
 Si dice "me ha pagado Acme" y ese cliente tiene más de una factura emitida sin cobrar, busca la que coincide con el importe que diga o pregúntale cuál. El hito ligado pasa a "cobrado" solo.
 
 ## Rectificar o anular
 
-`python trastienda.py rectificar <número> "<motivo>"` crea una rectificativa (serie `R2026-…`) que anula la factura entera, con importes en negativo. Si lo que había que cambiar era el importe o un dato, después se emite una factura nueva y correcta. Confirma antes, igual que al emitir.
+`python backoffice.py rectificar <número> "<motivo>"` crea una rectificativa (serie `R2026-…`) que anula la factura entera, con importes en negativo. Si lo que había que cambiar era el importe o un dato, después se emite una factura nueva y correcta. Confirma antes, igual que al emitir.
 
 ## Publicar
 
 ```
-python trastienda.py revisar
+python backoffice.py revisar
 git add datos && git commit -m "Factura 2026-004 a Acme" && git push
 ```
 

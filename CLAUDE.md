@@ -1,9 +1,9 @@
-# Trastienda
+# Freelance Backoffice
 
 El backoffice de un autónomo en este repo. Tú (Claude Code) eres quien mete los datos: clientes, proyectos, facturas, gastos, trimestres y espacios de cliente. La web (`/admin/`) solo los enseña.
 
-- Datos: JSON en `datos/` (formato en `docs/datos.md`). Con `TRASTIENDA_DATOS=demo`, los de ejemplo de `demo/`.
-- Motor: `python trastienda.py` (solo biblioteca estándar; Chrome para los PDF). Sin argumentos, lista los comandos.
+- Datos: JSON en `datos/` (formato en `docs/datos.md`). Con `BACKOFFICE_DATOS=demo`, los de ejemplo de `demo/`.
+- Motor: `python backoffice.py` (solo biblioteca estándar; Chrome para los PDF). Sin argumentos, lista los comandos.
 - Skills: `configurar` (primera vez), `backoffice` (clientes, proyectos, horas, preguntas), `factura`, `gasto` (gastos, gastos fijos, trimestres, ZIP para la gestoría) y `espacio` (propuestas y espacios privados para clientes).
 
 ## Reglas
@@ -22,7 +22,7 @@ El backoffice de un autónomo en este repo. Tú (Claude Code) eres quien mete lo
 Después de cualquier cambio en `datos/`:
 
 ```
-python trastienda.py revisar
+python backoffice.py revisar
 git add datos && git commit -m "<qué ha cambiado>" && git push
 ```
 

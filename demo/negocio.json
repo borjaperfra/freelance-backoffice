@@ -13,7 +13,7 @@
   "irpf": 7,
   "irpf_hasta": "2028-12-31",
   "vence_dias": 30,
-  "dominio": "https://demo.trastienda.example",
+  "dominio": "https://demo.freelance-backoffice.example",
   "gestoria": {
     "nombre": "Gestoría de Ejemplo",
     "email": "gestoria@example.com"

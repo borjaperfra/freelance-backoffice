@@ -1,4 +1,4 @@
-# Trastienda
+# Freelance Backoffice
 
 El backoffice de un autónomo en un repo de GitHub, con Claude Code como administrativo.
 
@@ -30,7 +30,7 @@ Para autónomos en España que ya usan [Claude Code](https://claude.com/claude-c
 ## Empezar
 
 1. Crea tu repo con **Use this template** en GitHub y hazlo **privado**: va a guardar tus datos fiscales y tus facturas.
-2. Clónalo, abre Claude Code dentro y dile: **«configura mi trastienda»**. Te pedirá tus datos, tu cuota de autónomos y tus suscripciones, y te enseñará el admin en local.
+2. Clónalo, abre Claude Code dentro y dile: **«configura mi backoffice»**. Te pedirá tus datos, tu cuota de autónomos y tus suscripciones, y te enseñará el admin en local.
 3. Para publicarlo (admin y espacios de cliente en tu dominio), sigue [docs/instalar.md](docs/instalar.md). Son unos 20 minutos en Cloudflare.
 
 Necesitas Python 3.10 o superior y Google Chrome (para los PDF). Nada más que instalar.
@@ -38,10 +38,10 @@ Necesitas Python 3.10 o superior y Google Chrome (para los PDF). Nada más que i
 ### Probar con la demo
 
 ```
-TRASTIENDA_DATOS=demo python trastienda.py servir
+BACKOFFICE_DATOS=demo python backoffice.py servir
 ```
 
-En PowerShell: `$env:TRASTIENDA_DATOS="demo"; python trastienda.py servir`. Abre el admin con los datos de una diseñadora inventada, Lucía Ferrer: tres clientes, facturas, gastos, un trimestre presentado y dos espacios.
+En PowerShell: `$env:BACKOFFICE_DATOS="demo"; python backoffice.py servir`. Abre el admin con los datos de una diseñadora inventada, Lucía Ferrer: tres clientes, facturas, gastos, un trimestre presentado y dos espacios.
 
 ## Cómo se usa
 
@@ -49,7 +49,7 @@ Le hablas a Claude Code y él usa estas skills:
 
 | Skill | Le dices… |
 |---|---|
-| `configurar` | «configura mi trastienda» |
+| `configurar` | «configura mi backoffice» |
 | `backoffice` | «nuevo cliente: …», «he terminado la Fase 1 de Acme», «hoy 3 h con Acme», «¿qué me deben?» |
 | `factura` | «factura a Acme la Fase 1», «me ha pagado Acme», «la 2026-004 está mal» |
 | `gasto` | «apunta este gasto» (con el PDF), «revisa el Gmail», «¿cuánto aparto este trimestre?», «cierra el 4T», «el ZIP de noviembre» |
@@ -57,7 +57,7 @@ Le hablas a Claude Code y él usa estas skills:
 
 Cada cambio acaba en un commit. Al hacer `git push`, GitHub Actions publica el admin y los espacios.
 
-Todo pasa por `python trastienda.py`, que también puedes usar a mano. Sin argumentos, lista los comandos. El formato de los datos está en [docs/datos.md](docs/datos.md).
+Todo pasa por `python backoffice.py`, que también puedes usar a mano. Sin argumentos, lista los comandos. El formato de los datos está en [docs/datos.md](docs/datos.md).
 
 ## Seguridad
 
@@ -68,9 +68,9 @@ Todo pasa por `python trastienda.py`, que también puedes usar a mano. Sin argum
 
 ## Aviso
 
-Trastienda es software libre que se ofrece tal cual, sin garantía (ver [LICENSE](LICENSE)). **No es asesoramiento fiscal ni contable.** Las cifras del 303 y el 130 son una estimación para revisarla con tu gestoría: no aplican prorrata, la deducción del art. 110.3.c, gastos de difícil justificación ni amortizaciones. Tú eres responsable de lo que facturas y de lo que presentas.
+Freelance Backoffice es software libre que se ofrece tal cual, sin garantía (ver [LICENSE](LICENSE)). **No es asesoramiento fiscal ni contable.** Las cifras del 303 y el 130 son una estimación para revisarla con tu gestoría: no aplican prorrata, la deducción del art. 110.3.c, gastos de difícil justificación ni amortizaciones. Tú eres responsable de lo que facturas y de lo que presentas.
 
-**Verifactu.** Trastienda no envía las facturas a la Agencia Tributaria ni las firma. Cuando el reglamento de sistemas de facturación te sea obligatorio (para autónomos está previsto desde julio de 2027), cumplirlo es responsabilidad tuya: tendrás que facturar con un sistema que lo cumpla.
+**Verifactu.** Freelance Backoffice no envía las facturas a la Agencia Tributaria ni las firma. Cuando el reglamento de sistemas de facturación te sea obligatorio (para autónomos está previsto desde julio de 2027), cumplirlo es responsabilidad tuya: tendrás que facturar con un sistema que lo cumpla.
 
 ## Licencia
 

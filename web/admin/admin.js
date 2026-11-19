@@ -1,4 +1,4 @@
-// Trastienda: pinta datos.json. Solo lee; los cambios se hacen con Claude Code y trastienda.py.
+// Freelance Backoffice: pinta datos.json. Solo lee; los cambios se hacen con Claude Code y backoffice.py.
 (function () {
   var D, app = document.getElementById('app');
 
@@ -372,7 +372,7 @@
     ]);
     html += '<h2>' + lista.length + ' facturas</h2>' + tabla(COLS_FACTURA, lista.map(filaFactura), 'Ninguna factura en ' + anyo + '.');
     return html + pista('Las rectificativas restan y anulan la original, así que las cifras de arriba ya son netas. ' +
-      'Para el trimestre: <code>python trastienda.py resumen ' + trimestre(hoy) + '</code>');
+      'Para el trimestre: <code>python backoffice.py resumen ' + trimestre(hoy) + '</code>');
   };
 
   V.factura = function (n) {
@@ -525,7 +525,7 @@
     app.innerHTML = V[vista](decodeURIComponent(partes[1] || ''));
     var seccion = { cliente: 'clientes', proyecto: 'proyectos', factura: 'facturas', trimestre: 'trimestres' }[vista] || vista;
     document.querySelectorAll('nav a').forEach(function (a) { a.classList.toggle('on', a.dataset.v === seccion); });
-    document.title = (app.querySelector('h1') || {}).textContent + ' · ' + ((D.negocio || {}).nombre || 'Trastienda');
+    document.title = (app.querySelector('h1') || {}).textContent + ' · ' + ((D.negocio || {}).nombre || 'Backoffice');
     window.scrollTo(0, 0);
   };
   app.addEventListener('click', function (e) {
@@ -541,6 +541,6 @@
     if (d.negocio && d.negocio.nombre) document.querySelector('.brand').textContent = d.negocio.nombre;
     pintar();
   }).catch(function () {
-    app.innerHTML = '<h1>Sin datos</h1><p class="sub">No encuentro datos.json. Móntalo con <code>python trastienda.py servir</code>.</p>';
+    app.innerHTML = '<h1>Sin datos</h1><p class="sub">No encuentro datos.json. Móntalo con <code>python backoffice.py servir</code>.</p>';
   });
 })();

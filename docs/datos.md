@@ -1,6 +1,6 @@
 # Los datos
 
-Todo vive en `datos/` y es JSON (o Markdown, los espacios). El nombre del archivo es el identificador (slug). `python trastienda.py init` crea la estructura vacía; `demo/` tiene un ejemplo completo con datos inventados.
+Todo vive en `datos/` y es JSON (o Markdown, los espacios). El nombre del archivo es el identificador (slug). `python backoffice.py init` crea la estructura vacía; `demo/` tiene un ejemplo completo con datos inventados.
 
 ## negocio.json
 
@@ -67,12 +67,12 @@ El IVA y el IRPF salen solos de `pais` y `tipo`:
 
 ## facturas/<año>/<número>.json
 
-No se tocan a mano. Las crea `python trastienda.py emitir`, que también escribe el PDF al lado.
+No se tocan a mano. Las crea `python backoffice.py emitir`, que también escribe el PDF al lado.
 Lo único que cambia después es el estado (`cobrar`, `rectificar`).
 
 ## gastos/<año>/<id>.json
 
-Cada gasto con su factura al lado (`<id>.pdf` o `.jpg`). Los crea `python trastienda.py gasto <borrador.json> <factura>`, que calcula las cifras fiscales:
+Cada gasto con su factura al lado (`<id>.pdf` o `.jpg`). Los crea `python backoffice.py gasto <borrador.json> <factura>`, que calcula las cifras fiscales:
 
 | Campo | Qué es |
 |---|---|
@@ -87,11 +87,11 @@ Cada gasto con su factura al lado (`<id>.pdf` o `.jpg`). Los crea `python trasti
 
 ## gastos/recurrentes.json
 
-Los gastos fijos de cada mes. `python trastienda.py recurrentes` apunta los que falten.
+Los gastos fijos de cada mes. `python backoffice.py recurrentes` apunta los que falten.
 
 ## trimestres/<2026-4T>/
 
-El resumen PDF y los libros en Excel de cada trimestre cerrado (`python trastienda.py trimestre`), y `presentado.json` cuando la gestoría lo ha presentado.
+El resumen PDF y los libros en Excel de cada trimestre cerrado (`python backoffice.py trimestre`), y `presentado.json` cuando la gestoría lo ha presentado.
 
 ## Campos opcionales
 
@@ -107,4 +107,4 @@ Un espacio privado para un cliente: cabecera `clave: valor` y el texto en Markdo
 
 ## espacios/accesos.json
 
-Quién entra en cada espacio: `{slug: [{nombre, hash, creado}]}`. Lo escriben `python trastienda.py enlace` y `revocar`. Solo guarda el SHA-256 de cada clave.
+Quién entra en cada espacio: `{slug: [{nombre, hash, creado}]}`. Lo escriben `python backoffice.py enlace` y `revocar`. Solo guarda el SHA-256 de cada clave.

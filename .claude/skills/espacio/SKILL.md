@@ -47,8 +47,8 @@ Texto en Markdown: ## secciones, listas, **negrita**, [enlaces](https://…), ta
 
 Confirma siempre antes, con el nombre de la persona y el espacio.
 
-- Dar: `python trastienda.py enlace <slug> "Nombre Apellido"`. Enseña el enlace a la persona **una vez**, en el chat. No lo guardes en ningún archivo ni lo mandes a ningún servicio. Si quiere, déjale un **borrador** de email con el enlace para su cliente (nunca lo envíes).
-- Quitar: `python trastienda.py revocar <slug> "Nombre Apellido"`.
+- Dar: `python backoffice.py enlace <slug> "Nombre Apellido"`. Enseña el enlace a la persona **una vez**, en el chat. No lo guardes en ningún archivo ni lo mandes a ningún servicio. Si quiere, déjale un **borrador** de email con el enlace para su cliente (nunca lo envíes).
+- Quitar: `python backoffice.py revocar <slug> "Nombre Apellido"`.
 - Quién entra: el admin lo enseña en Espacios, o `datos/espacios/accesos.json` (nombres y fechas; los hashes no dicen nada).
 - Si alguien pierde el enlace: revoca el suyo y crea uno nuevo.
 
@@ -57,8 +57,8 @@ Los cambios de acceso valen cuando se publica.
 ## Publicar
 
 ```
-python trastienda.py revisar
+python backoffice.py revisar
 git add datos && git commit -m "Espacio de <cliente>: …" && git push
 ```
 
-En local, `python trastienda.py servir` y `http://127.0.0.1:8081/c/<slug>/` (en local no pide clave). Publicado, la persona lo ve sin clave en el admin: Espacios → Ver.
+En local, `python backoffice.py servir` y `http://127.0.0.1:8081/c/<slug>/` (en local no pide clave). Publicado, la persona lo ve sin clave en el admin: Espacios → Ver.

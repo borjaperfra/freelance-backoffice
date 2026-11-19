@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  PROYECTO: trastienda   # el mismo name que en wrangler.toml
+  PROYECTO: freelance-backoffice   # el mismo name que en wrangler.toml
 
 jobs:
   publicar:
@@ -40,12 +40,12 @@ jobs:
 
       - name: Revisar los datos
         if: steps.datos.outputs.hay == '1'
-        run: python trastienda.py revisar
+        run: python backoffice.py revisar
 
       # Las facturas llevan su PDF en el repo; aquí no se genera ninguno.
       - name: Montar el sitio
         if: steps.datos.outputs.hay == '1'
-        run: python trastienda.py build
+        run: python backoffice.py build
 
       # La primera vez crea el proyecto de Pages; las demás falla porque ya existe, y da igual.
       - name: Crear el proyecto de Pages

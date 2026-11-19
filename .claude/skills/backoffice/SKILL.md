@@ -1,6 +1,6 @@
 ---
 name: backoffice
-description: Lleva los clientes, proyectos, hitos y tareas de la persona en su trastienda (datos/) y contesta preguntas sobre su negocio. Úsala cuando la persona diga "nuevo cliente…", "nuevo proyecto para X", "he terminado la Fase 1 de X", "apunta que…", "¿cuánto llevo facturado?", "¿qué me deben?", "¿cómo va el trimestre?", cuando quiera ver el admin, o cuando un cliente acepte una propuesta. Para emitir, cobrar o rectificar facturas, usa la skill factura; para gastos y trimestres, la skill gasto.
+description: Lleva los clientes, proyectos, hitos y tareas de la persona en su backoffice (datos/) y contesta preguntas sobre su negocio. Úsala cuando la persona diga "nuevo cliente…", "nuevo proyecto para X", "he terminado la Fase 1 de X", "apunta que…", "¿cuánto llevo facturado?", "¿qué me deben?", "¿cómo va el trimestre?", cuando quiera ver el admin, o cuando un cliente acepte una propuesta. Para emitir, cobrar o rectificar facturas, usa la skill factura; para gastos y trimestres, la skill gasto.
 ---
 
 # Backoffice
@@ -25,7 +25,7 @@ Un archivo por proyecto: `datos/proyectos/<cliente>-<algo>.json`.
 - **Si hay propuesta** (un espacio en `datos/espacios/<slug>/`, un PDF o un documento que te pase), saca de ahí el precio, las fases y las fechas. Cada fase con precio es un hito.
 - Precios siempre en base, sin IVA.
 - Estados del proyecto: `propuesta`, `activo`, `pausado`, `terminado`, `perdido`.
-- Estados del hito: `pendiente` → `hecho` (terminado, falta facturar) → `facturado` → `cobrado`. Los dos últimos los pone `trastienda.py` al emitir y cobrar: no los toques a mano.
+- Estados del hito: `pendiente` → `hecho` (terminado, falta facturar) → `facturado` → `cobrado`. Los dos últimos los pone `backoffice.py` al emitir y cobrar: no los toques a mano.
 - "He terminado la Fase 1" → el hito pasa a `hecho` y pregúntale si lo facturas ya (skill factura).
 - Tareas y notas: añade, marca o borra lo que diga. Las notas son texto libre (decisiones, contexto, lo que dijo el cliente).
 
@@ -55,7 +55,7 @@ En los proyectos en `propuesta`:
 
 ## Resumen de la semana
 
-`python trastienda.py semana` saca en Markdown lo que falta, lo que hay por cobrar, las entregas de las dos próximas semanas, lo que hay que apartar y las horas del mes. Úsalo cuando pregunte "¿qué tengo esta semana?" o "¿cómo voy?".
+`python backoffice.py semana` saca en Markdown lo que falta, lo que hay por cobrar, las entregas de las dos próximas semanas, lo que hay que apartar y las horas del mes. Úsalo cuando pregunte "¿qué tengo esta semana?" o "¿cómo voy?".
 
 ## Preguntas sobre el negocio
 
@@ -64,13 +64,13 @@ Contesta leyendo los JSON (con un script corto de Python si hay que sumar). Los 
 - Facturado: suma `base` de `datos/facturas/*/*.json`. Las rectificativas tienen importes negativos, así que sumarlo todo da el neto.
 - Pendiente de cobro: `estado == "emitida"` y `tipo == "ordinaria"`; vencidas si `vence` < hoy.
 - Gastos: suma `base` (o `gasto_irpf` para el IRPF) de `datos/gastos/*/*.json`.
-- Trimestre e impuestos: `python trastienda.py resumen 2026-4T` (ver la skill gasto).
+- Trimestre e impuestos: `python backoffice.py resumen 2026-4T` (ver la skill gasto).
 
 Da la cifra primero, y luego el detalle si hace falta.
 
 ## Ver el admin
 
-- En local: `python trastienda.py servir` (abre http://127.0.0.1:8081).
+- En local: `python backoffice.py servir` (abre http://127.0.0.1:8081).
 - Publicado: `<dominio>/admin/` (detrás de Cloudflare Access).
 
 ## Publicar
@@ -78,7 +78,7 @@ Da la cifra primero, y luego el detalle si hace falta.
 Después de cualquier cambio:
 
 ```
-python trastienda.py revisar
+python backoffice.py revisar
 git add datos && git commit -m "<qué ha cambiado>" && git push
 ```
 

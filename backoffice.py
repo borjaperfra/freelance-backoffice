@@ -1,34 +1,34 @@
-"""Trastienda: el backoffice de un autónomo en un repo.
+"""Freelance Backoffice: el backoffice de un autónomo en un repo.
 
 Los datos son archivos JSON en datos/ (formato en docs/datos.md). Este script los valida,
 emite las facturas (número, IVA, IRPF y PDF), lleva gastos y trimestres, y monta la web:
 el admin (dist/sitio/admin/) y los espacios privados de cliente (dist/sitio/c/<slug>/).
 
-    python trastienda.py init                    crea datos/ con lo mínimo para empezar
-    python trastienda.py build                   monta dist/sitio/ (lo usa GitHub Actions)
-    python trastienda.py servir [puerto]         monta y abre el admin en local (8081)
-    python trastienda.py revisar                 comprueba que los datos están bien
+    python backoffice.py init                    crea datos/ con lo mínimo para empezar
+    python backoffice.py build                   monta dist/sitio/ (lo usa GitHub Actions)
+    python backoffice.py servir [puerto]         monta y abre el admin en local (8081)
+    python backoffice.py revisar                 comprueba que los datos están bien
 
-    python trastienda.py emitir <borrador.json>  emite una factura desde un borrador
-    python trastienda.py cobrar <número> [fecha] marca una factura como cobrada
-    python trastienda.py rectificar <número> "<motivo>"
+    python backoffice.py emitir <borrador.json>  emite una factura desde un borrador
+    python backoffice.py cobrar <número> [fecha] marca una factura como cobrada
+    python backoffice.py rectificar <número> "<motivo>"
                                                  anula una factura con una rectificativa
-    python trastienda.py pdf [número]            rehace el PDF de una factura (o de todas)
+    python backoffice.py pdf [número]            rehace el PDF de una factura (o de todas)
 
-    python trastienda.py gasto <borrador.json> [factura.pdf]
+    python backoffice.py gasto <borrador.json> [factura.pdf]
                                                  apunta un gasto con su factura
-    python trastienda.py recurrentes             apunta los gastos fijos de los meses que faltan
-    python trastienda.py resumen [2026-4T]       cifras del 303 y el 130 del trimestre
-    python trastienda.py trimestre [2026-4T]     paquete para la gestoría: resumen PDF, libros Excel y ZIP
-    python trastienda.py presentado [2026-4T]    apunta que la gestoría ya lo presentó
-    python trastienda.py mes [AAAA-MM]           ZIP del mes para la gestoría (por defecto, el pasado)
-    python trastienda.py banco <extracto.csv>    cruza el extracto del banco con facturas y gastos
-    python trastienda.py semana                  resumen de la semana en Markdown
+    python backoffice.py recurrentes             apunta los gastos fijos de los meses que faltan
+    python backoffice.py resumen [2026-4T]       cifras del 303 y el 130 del trimestre
+    python backoffice.py trimestre [2026-4T]     paquete para la gestoría: resumen PDF, libros Excel y ZIP
+    python backoffice.py presentado [2026-4T]    apunta que la gestoría ya lo presentó
+    python backoffice.py mes [AAAA-MM]           ZIP del mes para la gestoría (por defecto, el pasado)
+    python backoffice.py banco <extracto.csv>    cruza el extracto del banco con facturas y gastos
+    python backoffice.py semana                  resumen de la semana en Markdown
 
-    python trastienda.py enlace <espacio> "Nombre"   enlace personal a un espacio de cliente
-    python trastienda.py revocar <espacio> "Nombre"  le quita el acceso
+    python backoffice.py enlace <espacio> "Nombre"   enlace personal a un espacio de cliente
+    python backoffice.py revocar <espacio> "Nombre"  le quita el acceso
 
-Con TRASTIENDA_DATOS=demo usa los datos de ejemplo de demo/ en vez de datos/.
+Con BACKOFFICE_DATOS=demo usa los datos de ejemplo de demo/ en vez de datos/.
 
 Una factura emitida no se edita ni se borra: si está mal, se rectifica.
 Las cifras de impuestos son una estimación para tu gestoría: revísalas antes de presentar nada.
@@ -45,7 +45,7 @@ import sys
 from decimal import ROUND_HALF_UP, Decimal
 
 ROOT = pathlib.Path(__file__).resolve().parent
-DATOS = (ROOT / os.environ.get("TRASTIENDA_DATOS", "datos")).resolve()
+DATOS = (ROOT / os.environ.get("BACKOFFICE_DATOS", "datos")).resolve()
 WEB = ROOT / "web" / "admin"
 PLANTILLA_ESPACIO = ROOT / "web" / "espacio.html"
 SITIO = ROOT / "dist" / "sitio"
@@ -225,7 +225,7 @@ def problemas():
             errores.append(f"serie {serie}: hay facturas con fecha anterior a la de un número más bajo")
     for n in fas:
         if not ruta_factura(n).with_suffix(".pdf").exists():
-            errores.append(f"factura {n}: falta el PDF (python trastienda.py pdf {n})")
+            errores.append(f"factura {n}: falta el PDF (python backoffice.py pdf {n})")
     for slug_p, p in prs.items():
         for h in p.get("horas", []):
             if not h.get("fecha") or not isinstance(h.get("horas"), (int, float)) or h["horas"] <= 0:
@@ -315,7 +315,7 @@ def datos_receptor(c):
 
 def emitir():
     if len(sys.argv) < 3:
-        sys.exit("Uso: python trastienda.py emitir <borrador.json>")
+        sys.exit("Uso: python backoffice.py emitir <borrador.json>")
     b = leer(sys.argv[2])
     neg = negocio()
     faltan = [k for k in ("nombre", "nif", "direccion", "cp", "ciudad", "iban") if pendiente(neg.get(k))]
@@ -394,7 +394,7 @@ def marcar_hito(factura, estado):
 
 def cobrar():
     if len(sys.argv) < 3:
-        sys.exit("Uso: python trastienda.py cobrar <número> [AAAA-MM-DD]")
+        sys.exit("Uso: python backoffice.py cobrar <número> [AAAA-MM-DD]")
     numero = sys.argv[2]
     f = ruta_factura(numero)
     if not f.exists():
@@ -412,7 +412,7 @@ def cobrar():
 
 def rectificar():
     if len(sys.argv) < 4:
-        sys.exit('Uso: python trastienda.py rectificar <número> "<motivo>"')
+        sys.exit('Uso: python backoffice.py rectificar <número> "<motivo>"')
     numero, motivo = sys.argv[2], sys.argv[3]
     f = ruta_factura(numero)
     if not f.exists():
@@ -532,9 +532,9 @@ def tipo_cambio(moneda, dia):
 
 
 def registrar_gasto():
-    """python trastienda.py gasto <borrador.json> [archivo]"""
+    """python backoffice.py gasto <borrador.json> [archivo]"""
     if len(sys.argv) < 3:
-        sys.exit("Uso: python trastienda.py gasto <borrador.json> [factura.pdf|.jpg]")
+        sys.exit("Uso: python backoffice.py gasto <borrador.json> [factura.pdf|.jpg]")
     b = leer(sys.argv[2])
     archivo = pathlib.Path(sys.argv[3]) if len(sys.argv) > 3 else None
     neg = negocio()
@@ -929,7 +929,7 @@ def zip_mes(mes, destino):
 
 
 def mes():
-    """python trastienda.py mes [AAAA-MM]: el ZIP del mes para la gestoría (por defecto, el mes pasado)."""
+    """python backoffice.py mes [AAAA-MM]: el ZIP del mes para la gestoría (por defecto, el mes pasado)."""
     if len(sys.argv) > 2:
         m = sys.argv[2]
     else:
@@ -945,7 +945,7 @@ def mes():
 
 
 def presentado():
-    """python trastienda.py presentado 2026-4T: apunta que la gestoría ya lo presentó, con lo que salió."""
+    """python backoffice.py presentado 2026-4T: apunta que la gestoría ya lo presentó, con lo que salió."""
     t = leer_trimestre()
     r = calcular_trimestre(t)
     escribir(TRIMESTRES / t / "presentado.json",
@@ -995,9 +995,9 @@ def palabras(texto):
 
 
 def banco():
-    """python trastienda.py banco <extracto.csv>: cobros que cuadran con facturas y cargos de proveedores sin factura."""
+    """python backoffice.py banco <extracto.csv>: cobros que cuadran con facturas y cargos de proveedores sin factura."""
     if len(sys.argv) < 3:
-        sys.exit("Uso: python trastienda.py banco <extracto.csv>")
+        sys.exit("Uso: python backoffice.py banco <extracto.csv>")
     movs = leer_extracto(sys.argv[2])
     fas, gas = facturas(), gastos()
     fijos = leer(RECURRENTES) if RECURRENTES.exists() else []
@@ -1013,7 +1013,7 @@ def banco():
         for f in pendientes_cobro:
             if abs(m["importe"] - Decimal(str(f["total"]))) < Decimal("0.02") and m["fecha"] >= f["fecha"]:
                 print(f"  {m['fecha']}  {m['importe']:>9.2f} €  {m['concepto'][:40]:40}  → {f['numero']} "
-                      f"(python trastienda.py cobrar {f['numero']} {m['fecha']})")
+                      f"(python backoffice.py cobrar {f['numero']} {m['fecha']})")
                 hay = True
     if not hay:
         print("  ninguno")
@@ -1067,7 +1067,7 @@ def prevision_gastos(adelante=2):
 
     - confirmado: ya está apuntado con su factura (o no lleva factura, como la cuota de autónomos)
     - falta factura: apuntado con el importe aproximado; falta el PDF real
-    - pendiente: ya ha pasado su día y aún no está apuntado (python trastienda.py recurrentes)
+    - pendiente: ya ha pasado su día y aún no está apuntado (python backoffice.py recurrentes)
     - previsto: todavía no ha llegado su día
     """
     fijos = leer(RECURRENTES) if RECURRENTES.exists() else []
@@ -1511,12 +1511,12 @@ def build_sitio():
 
 
 def enlace():
-    """python trastienda.py enlace <espacio> "Nombre": crea un enlace personal y lo enseña una vez."""
+    """python backoffice.py enlace <espacio> "Nombre": crea un enlace personal y lo enseña una vez."""
     import hashlib
     import secrets
 
     if len(sys.argv) < 4:
-        sys.exit('Uso: python trastienda.py enlace <espacio> "Nombre de la persona"')
+        sys.exit('Uso: python backoffice.py enlace <espacio> "Nombre de la persona"')
     esp, nombre = sys.argv[2], sys.argv[3]
     if esp not in espacios():
         sys.exit(f"No existe el espacio {esp!r} (datos/espacios/{esp}/index.md)")
@@ -1533,9 +1533,9 @@ def enlace():
 
 
 def revocar():
-    """python trastienda.py revocar <espacio> "Nombre": quita sus enlaces."""
+    """python backoffice.py revocar <espacio> "Nombre": quita sus enlaces."""
     if len(sys.argv) < 4:
-        sys.exit('Uso: python trastienda.py revocar <espacio> "Nombre"')
+        sys.exit('Uso: python backoffice.py revocar <espacio> "Nombre"')
     esp, nombre = sys.argv[2], sys.argv[3]
     todos = accesos()
     antes = len(todos.get(esp, []))
@@ -1547,11 +1547,11 @@ def revocar():
 
 
 def init():
-    """python trastienda.py init: crea datos/ a partir de plantilla/ (no toca nada si ya existe)."""
+    """python backoffice.py init: crea datos/ a partir de plantilla/ (no toca nada si ya existe)."""
     if (DATOS / "negocio.json").exists():
         sys.exit(f"Ya tienes datos en {DATOS}. No toco nada.")
     shutil.copytree(ROOT / "plantilla", DATOS, dirs_exist_ok=True)
-    print(f"Creado {DATOS}. Ahora abre Claude Code en este repo y dile: «configura mi trastienda».")
+    print(f"Creado {DATOS}. Ahora abre Claude Code en este repo y dile: «configura mi backoffice».")
 
 
 def build(dest=DIST):

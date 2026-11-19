@@ -1,12 +1,12 @@
 # Cloudflare Pages: un solo proyecto con el admin (/admin/, detrás de Cloudflare Access)
 # y los espacios de cliente (/c/<slug>/, con enlace personal). Lo despliega .github/workflows/publicar.yml.
-name = "trastienda"
+name = "freelance-backoffice"
 pages_build_output_dir = "dist/sitio"
 compatibility_date = "2026-11-01"
 
 # Mientras estén vacías, /admin/ responde 403 a todo (cerrado, nunca abierto). Ver docs/instalar.md.
 [vars]
 ACCESS_TEAM = ""   # el subdominio de tu equipo de Zero Trust: <ACCESS_TEAM>.cloudflareaccess.com
-ACCESS_AUD = ""    # Access → Applications → Trastienda → Overview → Application Audience (AUD) Tag
+ACCESS_AUD = ""    # Access → Applications → Freelance Backoffice → Overview → Application Audience (AUD) Tag
 ADMIN_EMAIL = ""   # el email con el que entras (o varios, separados por comas)
 DEMO = ""          # "1" solo para la demo pública con datos inventados: deja /admin/ abierto

@@ -1,4 +1,4 @@
-# Trastienda
+# Freelance Backoffice
 
 A freelancer's back office that lives in a GitHub repo, with Claude Code as the office assistant.
 
