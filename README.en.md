@@ -10,6 +10,8 @@ It runs on the free plans of Cloudflare Pages and GitHub Actions. No database, n
 
 To check your setup at any time, run `python backoffice.py doctor`. To get new versions, `python backoffice.py actualizar`: it updates the code and never touches your `datos/` folder.
 
+**Melso.** If your taxes are handled by [Melso](https://melso.ai), the online accounting firm, the back office sends them your expenses (with the PDFs), the invoices you issue and your payments through Melso's MCP server, and compares its VAT estimate with theirs. Invoices are still issued here, and it never issues invoices, files taxes or deletes anything in Melso. It hasn't been tried with a real Melso account yet. See [docs/melso.md](docs/melso.md) (in Spanish).
+
 See the Spanish [README](README.md) for features, setup and the disclaimer: this is not tax advice, figures are estimates to review with your accountant, and Verifactu compliance is the user's responsibility.
 
 MIT licensed.

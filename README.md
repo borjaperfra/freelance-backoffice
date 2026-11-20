@@ -64,6 +64,30 @@ Cada cambio acaba en un commit, y con cada `git push` GitHub publica el admin y 
 
 Debajo de todo está `python backoffice.py`, que también puedes usar a mano: sin argumentos, lista los comandos.
 
+## Melso
+
+Si llevas tus impuestos con [Melso](https://melso.ai), la gestoría online, el backoffice les manda lo que haces aquí y no tienes que subirlo dos veces:
+
+- cada **gasto**, con el PDF de su factura;
+- cada **factura emitida**, con su PDF, y el cliente si Melso no lo tiene;
+- los **cobros**, que se marcan como cobrados en Melso.
+
+También **compara el 303**: pone tu estimación al lado de la que ha calculado Melso y, si no cuadran, busca qué falta en cada lado.
+
+Las facturas se siguen emitiendo aquí, con tu numeración. El backoffice no emite facturas en Melso, ni aprueba o presenta impuestos, ni borra nada allí: eso lo haces tú en Melso.
+
+Se conecta con el servidor MCP de Melso. Entras con tu cuenta de Melso y no hay ninguna clave en el repo:
+
+```
+claude mcp add --transport http melso https://mcp.melso.ai/mcp
+```
+
+Después, en Claude Code, escribe `/mcp`, elige **melso** y autentícate. Luego dile «conecta Melso»: te preguntará desde qué fecha te lleva Melso los impuestos, porque lo anterior no se manda. A partir de ahí, «manda lo pendiente a Melso». El admin te avisa cuando hay algo por mandar, y `python backoffice.py melso pendiente` te lo enseña en la terminal.
+
+Lo que se ha mandado, y con qué id quedó en Melso, se guarda en `datos/melso.json`.
+
+**Todavía no se ha probado con una cuenta real de Melso**: la primera vez, mira con calma lo que hace. Todos los detalles están en [docs/melso.md](docs/melso.md).
+
 ## Documentación
 
 - [Publicar en Cloudflare](docs/instalar.md)
