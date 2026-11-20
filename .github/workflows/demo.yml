@@ -26,6 +26,8 @@ jobs:
       DEMO: '1'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # revisar compara las facturas con su historial
 
       - uses: actions/setup-python@v5
         with:
