@@ -6,6 +6,8 @@ Tus clientes, proyectos, propuestas, facturas, gastos y trimestres son archivos 
 
 Funciona con los planes gratuitos de Cloudflare y GitHub. No hay base de datos ni cuenta en ningún SaaS: si un día lo dejas, te quedas con tus archivos.
 
+**Pruébalo sin instalar nada:** [backoffice.borjaperezfrances.com/admin/](https://backoffice.borjaperezfrances.com/admin/), con los datos de una diseñadora inventada.
+
 ![El admin: lo que falta, lo que te deben y lo que tienes que apartar](docs/img/admin-hoy.png)
 
 ## Qué hace
@@ -39,6 +41,10 @@ Necesitas Python 3.10 o superior, git, Google Chrome (para los PDF de las factur
 Para comprobar en cualquier momento que todo está en su sitio: `python backoffice.py doctor`.
 
 ### Probar con la demo
+
+En la web: el [admin](https://backoffice.borjaperezfrances.com/admin/), el [espacio de un proyecto](https://backoffice.borjaperezfrances.com/c/acme-robotica-web/) y el [de una propuesta](https://backoffice.borjaperezfrances.com/c/panaderia-lola/). Se actualiza con cada versión.
+
+En tu ordenador:
 
 ```
 BACKOFFICE_DATOS=demo python backoffice.py servir
