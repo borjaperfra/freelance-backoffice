@@ -2,6 +2,11 @@
 
 Cada versión, con lo que trae y si hay que hacer algo al actualizar. `python backoffice.py actualizar` enseña la sección de la versión nueva antes de instalarla.
 
+## 0.2.1 · 2026-11-20
+
+- `cloudflare`: si el token no se ha pegado bien (pasa en algunas terminales de Windows con Ctrl+V), lo dice en vez de hablar de permisos.
+- Demo pública en backoffice.borjaperezfrances.com, con el admin y los espacios abiertos.
+
 ## 0.2.0 · 2026-11-20
 
 Para actualizar desde la 0.1: copia los archivos de esta versión encima de los tuyos (la 0.1 no tenía `actualizar`), sin tocar `datos/`, y ejecuta `python backoffice.py migrar`. Si tenías las variables de Access en `wrangler.toml`, `migrar` las pasa a GitHub.

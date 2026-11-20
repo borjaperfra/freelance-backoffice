@@ -452,6 +452,23 @@ class Cloudflare:
             raise SystemExit(f"No llego a Cloudflare ({e}). Mira tu conexión y vuelve a lanzarlo.")
 
 
+def leer_token(pregunta):
+    import getpass
+    print("  (En Windows, pega con clic derecho o Ctrl+Shift+V: Ctrl+V a veces no pega aquí.)")
+    return getpass.getpass(pregunta).strip()
+
+
+def revisar_token(token):
+    """Antes de llamar a Cloudflare: que lo leído parezca un token. Dice cuánto ha leído, nunca qué."""
+    raro = [c for c in token if not (c.isascii() and (c.isalnum() or c in "-_."))]
+    if not token or len(token) < 30 or raro:
+        motivo = ("no he leído nada" if not token else
+                  f"he leído {len(token)} caracteres y {'hay caracteres que no son de un token' if raro else 'un token tiene unos 40 o más'}")
+        sys.exit(f"El token no se ha leído bien: {motivo}.\n"
+                 "Vuelve a lanzarlo y pega con clic derecho o Ctrl+Shift+V. "
+                 "O ponlo antes en la variable CLOUDFLARE_API_TOKEN de esa terminal.")
+
+
 def cloudflare():
     """python backoffice.py cloudflare [--cuenta <id>] [--proyecto <nombre>]: publica en Cloudflare en un paso."""
     import getpass
@@ -474,10 +491,13 @@ def cloudflare():
         if not sys.stdin.isatty():
             sys.exit("Ejecuta este comando tú, en una terminal: python backoffice.py cloudflare\n"
                      "Te pedirá el token de Cloudflare sin que pase por el chat.")
-        token = getpass.getpass("Token de Cloudflare (no se ve al escribirlo): ").strip()
+        token = leer_token("Token de Cloudflare (no se ve al escribirlo): ")
+    revisar_token(token)
     cf = Cloudflare(token)
+    if cf("GET", "/user/tokens/verify", permitir=(400,)).get("_codigo") == 400:
+        sys.exit("Cloudflare no reconoce lo que he leído como un token. Cópialo otra vez entero desde Cloudflare y vuelve a lanzarlo.")
     if cf("GET", "/user/tokens/verify").get("result", {}).get("status") != "active":
-        sys.exit("El token no está activo.")
+        sys.exit("El token no está activo (¿caducado o desactivado?).")
 
     cuentas = cf("GET", "/accounts")["result"]
     cuenta = opcion("--cuenta") or (cuentas[0]["id"] if len(cuentas) == 1 else None)
@@ -558,8 +578,9 @@ def cloudflare():
     if not publicar and sys.stdin.isatty():
         import getpass
         print("\nPara GitHub conviene un token aparte con un solo permiso: Account · Cloudflare Pages · Edit.")
-        publicar = getpass.getpass("Token para GitHub (Enter para usar el mismo de antes): ").strip()
+        publicar = leer_token("Token para GitHub (Enter para usar el mismo de antes): ")
     if publicar and publicar != token:
+        revisar_token(publicar)
         Cloudflare(publicar)("GET", "/user/tokens/verify")
     fallos = []
     for k, v in (("CLOUDFLARE_API_TOKEN", publicar or token), ("CLOUDFLARE_ACCOUNT_ID", cuenta)):
