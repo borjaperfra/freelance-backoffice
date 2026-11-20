@@ -466,12 +466,16 @@ def leer_token(pregunta, otro_igual=""):
         raiz = None
     if raiz is not None:
         try:
+            import getpass
             print(pregunta)
             for intento in range(3):
-                if otro_igual:
-                    input("  Copia el otro token y pulsa Enter (o pulsa Enter sin copiar nada para usar el mismo): ")
-                else:
-                    input("  Copia el token (botón de copiar de Cloudflare) y pulsa Enter aquí: ")
+                # getpass y no input: si alguien pega el token aquí en vez de solo pulsar Enter, no se ve.
+                escrito = getpass.getpass(
+                    "  Copia el otro token y pulsa Enter (o pulsa Enter sin copiar nada para usar el mismo): " if otro_igual
+                    else "  Copia el token (botón de copiar de Cloudflare) y pulsa Enter aquí: ").strip()
+                if parece_token(escrito):
+                    print(f"  Leído lo que has pegado ({len(escrito)} caracteres).")
+                    return "" if escrito == otro_igual else escrito
                 try:
                     leido = raiz.clipboard_get().strip()
                 except tkinter.TclError:

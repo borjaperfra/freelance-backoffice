@@ -2,6 +2,11 @@
 
 Cada versión, con lo que trae y si hay que hacer algo al actualizar. `python backoffice.py actualizar` enseña la sección de la versión nueva antes de instalarla.
 
+## 0.2.4 · 2026-11-20
+
+- `cloudflare`: la pregunta de «pulsa Enter» ya no enseña lo que se escribe, y si pegas ahí el token también vale.
+- Probado de principio a fin contra Cloudflare: proyecto de Pages, dominio, DNS, Access, secretos en GitHub, publicación y login.
+
 ## 0.2.3 · 2026-11-20
 
 - `cloudflare`: si lo que hay en el portapapeles no es un token, lo dice, no lo borra y te deja volver a copiarlo sin empezar de nuevo.
