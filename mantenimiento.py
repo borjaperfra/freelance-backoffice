@@ -466,27 +466,36 @@ def leer_token(pregunta, otro_igual=""):
         raiz = None
     if raiz is not None:
         try:
-            if otro_igual:
-                input(f"{pregunta}\n  Copia el otro token y pulsa Enter (o pulsa Enter sin copiar nada para usar el mismo): ")
-            else:
-                input(f"{pregunta}\n  Copia el token (botón de copiar de Cloudflare) y pulsa Enter aquí: ")
-            try:
-                leido = raiz.clipboard_get().strip()
-            except tkinter.TclError:
-                leido = ""
-            if leido and leido != otro_igual:
-                raiz.clipboard_clear()   # que no se quede en el portapapeles
-                raiz.update()
-                print(f"  Leído del portapapeles ({len(leido)} caracteres) y borrado de allí.")
-                return leido
-            if otro_igual:
-                print("  Uso el mismo token.")
-                return ""
-            print("  El portapapeles está vacío. Pégalo aquí (no se verá):")
+            print(pregunta)
+            for intento in range(3):
+                if otro_igual:
+                    input("  Copia el otro token y pulsa Enter (o pulsa Enter sin copiar nada para usar el mismo): ")
+                else:
+                    input("  Copia el token (botón de copiar de Cloudflare) y pulsa Enter aquí: ")
+                try:
+                    leido = raiz.clipboard_get().strip()
+                except tkinter.TclError:
+                    leido = ""
+                if otro_igual and (not leido or leido == otro_igual or not parece_token(leido)):
+                    print("  Uso el mismo token.")
+                    return ""
+                if parece_token(leido):
+                    raiz.clipboard_clear()   # que no se quede en el portapapeles
+                    raiz.update()
+                    print(f"  Leído del portapapeles ({len(leido)} caracteres) y borrado de allí.")
+                    return leido
+                # Lo que hay no es un token (lo más normal: se ha copiado otra cosa después). No se toca.
+                print("  En el portapapeles no hay un token" + (f" (hay {len(leido)} caracteres de otra cosa)" if leido else "") +
+                      ". ¿Has copiado algo después? Vuelve a pulsar el botón de copiar de Cloudflare.")
+            sys.exit("No he encontrado el token en el portapapeles. Vuelve a lanzarlo cuando lo tengas copiado.")
         finally:
             raiz.destroy()
     import getpass
     return getpass.getpass(f"{pregunta} ").strip()
+
+
+def parece_token(texto):
+    return len(texto) >= 30 and all(c.isascii() and (c.isalnum() or c in "-_.") for c in texto)
 
 
 def revisar_token(token):

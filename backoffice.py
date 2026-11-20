@@ -56,7 +56,7 @@ import subprocess
 import sys
 from decimal import ROUND_HALF_UP, Decimal
 
-VERSION = "0.2.2"      # la del código; actualizar la compara con la del repo original
+VERSION = "0.2.3"      # la del código; actualizar la compara con la del repo original
 DATOS_VERSION = 1      # la del formato de datos/; si sube, hace falta una migración en mantenimiento.py
 
 ROOT = pathlib.Path(__file__).resolve().parent

@@ -2,6 +2,10 @@
 
 Cada versión, con lo que trae y si hay que hacer algo al actualizar. `python backoffice.py actualizar` enseña la sección de la versión nueva antes de instalarla.
 
+## 0.2.3 · 2026-11-20
+
+- `cloudflare`: si lo que hay en el portapapeles no es un token, lo dice, no lo borra y te deja volver a copiarlo sin empezar de nuevo.
+
 ## 0.2.2 · 2026-11-20
 
 - `cloudflare` lee el token del portapapeles: lo copias en Cloudflare y pulsas Enter. Pegar en una entrada oculta fallaba en algunas terminales de Windows. Después lo borra del portapapeles.
