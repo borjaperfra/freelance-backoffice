@@ -1,0 +1,14 @@
+{
+  "codigo": "D-002",
+  "titulo": "Castellano e inglés desde el lanzamiento",
+  "estado": "aprobada",
+  "fecha": "2026-11-10",
+  "responsable": "Ana Ríos",
+  "descripcion": "",
+  "justificacion": "Un tercio de los presupuestos de 2025 vinieron de Portugal y Francia, y se gestionaron en inglés.",
+  "riesgos": "Traducir las fichas técnicas lleva unas dos semanas.",
+  "documentos": [],
+  "entregables": [
+    "04"
+  ]
+}

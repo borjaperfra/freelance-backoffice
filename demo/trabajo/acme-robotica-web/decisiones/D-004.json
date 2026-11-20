@@ -1,0 +1,16 @@
+{
+  "codigo": "D-004",
+  "titulo": "Enseñar un precio orientativo en cada robot",
+  "estado": "propuesta",
+  "fecha": "2026-11-18",
+  "responsable": "Ana Ríos",
+  "descripcion": "Una horquilla («desde 18.000 €») en la ficha de cada modelo.",
+  "justificacion": "Los seis entrevistados lo pidieron. Ahorra la llamada que solo sirve para saber si están en presupuesto.",
+  "riesgos": "Dirección comercial teme que la competencia use el dato.",
+  "documentos": [
+    "01-investigacion"
+  ],
+  "entregables": [
+    "02"
+  ]
+}

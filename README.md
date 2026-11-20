@@ -1,8 +1,8 @@
 # Freelance Backoffice
 
-El backoffice de un autónomo en un repo de GitHub, con Claude Code como administrativo.
+El backoffice de un autónomo en un repo de GitHub, con tu agente de código como administrativo.
 
-Tus clientes, proyectos, propuestas, facturas, gastos y trimestres son archivos JSON y PDF en tu repo privado. Le cuentas a Claude Code lo que ha pasado («factura a Acme la Fase 1», «apunta este gasto», «cierra el 4T») y él hace el trabajo. Una web sencilla te lo enseña todo, y cada cliente ve su propuesta o su proyecto en una página privada, con un enlace personal.
+Tus clientes, proyectos, propuestas, facturas, gastos y trimestres son archivos JSON y PDF en tu repo privado. Le cuentas a tu agente de código (Claude Code, Pi, Codex, OpenCode…) lo que ha pasado («factura a Acme la Fase 1», «apunta este gasto», «cierra el 4T») y él hace el trabajo. Una web sencilla te lo enseña todo, y cada cliente ve su propuesta o su proyecto en una página privada, con un enlace personal.
 
 Funciona con los planes gratuitos de Cloudflare y GitHub. No hay base de datos ni cuenta en ningún SaaS: si un día lo dejas, te quedas con tus archivos.
 
@@ -15,10 +15,11 @@ Funciona con los planes gratuitos de Cloudflare y GitHub. No hay base de datos n
 - **Clientes y proyectos**, con su estado, hitos con precio y fecha, horas y seguimiento de las propuestas que no contestan.
 - **Facturas** numeradas, con el IVA y la retención que tocan según el cliente (España, UE o fuera), su PDF, cobros y rectificativas. Una factura emitida no se puede cambiar, y GitHub lo comprueba en cada push.
 - **Gastos** a partir del PDF o la foto de la factura: IVA deducible, inversión del sujeto pasivo con proveedores extranjeros, porcentaje de uso profesional, cambio de moneda del BCE y equipos que se amortizan.
-- **Gastos del correo**: Claude Code busca en tu Gmail o tu Outlook las facturas nuevas de tus proveedores y las apunta. Si no quieres conectar el correo, las dejas en una carpeta.
+- **Gastos del correo**: tu agente busca en tu Gmail o tu Outlook las facturas nuevas de tus proveedores y las apunta. Si no quieres conectar el correo, las dejas en una carpeta.
 - **Gastos fijos** (cuota de autónomos, suscripciones), con lo que ha llegado este mes y lo que falta.
 - **Trimestres**: estimación del 303 y del 130, resumen en PDF, libros en Excel y un ZIP para la gestoría. También uno por mes.
 - **El extracto del banco**: lo cruza con tus facturas y gastos y te dice qué cobros cuadran y qué cargos no tienen factura.
+- **Proyectos por fases**: las fases con la actual marcada, los entregables como carpetas, documentos en Markdown que salen como presentación o documento con su PDF y sus versiones, decisiones, pruebas y un resumen por capítulos. Tu cliente puede ver el proyecto entero, igual que tú y en solo lectura. Ver [docs/trabajo.md](docs/trabajo.md).
 - **Espacios de cliente**: una página privada por propuesta o proyecto, escrita en Markdown, con sus hitos, facturas y archivos. Cada persona entra con su enlace, y puedes quitárselo cuando quieras.
 - **Melso**: si llevas los impuestos con [Melso](https://melso.ai), le manda tus facturas y gastos.
 
@@ -28,14 +29,16 @@ Funciona con los planes gratuitos de Cloudflare y GitHub. No hay base de datos n
 
 ## Para quién es
 
-Para autónomos en España que ya usan [Claude Code](https://claude.com/claude-code) y tienen cuenta en GitHub: gente de desarrollo, diseño, consultoría o formación. No hace falta programar, pero sí no asustarse con una terminal. La fiscalidad es la española: IVA, IRPF, modelos 303 y 130 y estimación directa simplificada.
+Para autónomos en España que ya trabajan con un agente de código (Claude Code, Pi, Codex, OpenCode…) y tienen cuenta en GitHub: gente de desarrollo, diseño, consultoría o formación. No hace falta programar, pero sí no asustarse con una terminal. La fiscalidad es la española: IVA, IRPF, modelos 303 y 130 y estimación directa simplificada.
 
 ## Empezar
 
-Necesitas Python 3.10 o superior, git, Google Chrome (para los PDF de las facturas) y Claude Code. Para publicarlo, también [gh](https://cli.github.com) y una cuenta de Cloudflare.
+Necesitas Python 3.10 o superior, git, Google Chrome (para los PDF de las facturas y los documentos) y tu agente de código. Para publicarlo, también [gh](https://cli.github.com) y una cuenta de Cloudflare.
+
+Las instrucciones para el agente están en `CLAUDE.md` y las skills, en `.claude/skills/`. Claude Code las lee solo. Para Codex, Pi, OpenCode y los que buscan `AGENTS.md`, ese archivo les dice dónde está cada cosa.
 
 1. En GitHub, **Use this template → Create a new repository**, y márcalo como **privado**: va a guardar tus datos fiscales y tus facturas.
-2. Clónalo, abre Claude Code dentro y dile **«configura mi backoffice»**. Te pedirá tus datos, tu cuota de autónomos y tus suscripciones, conectará el correo para los gastos si quieres y te enseñará el admin en tu ordenador.
+2. Clónalo, abre tu agente dentro y dile **«configura mi backoffice»**. Te pedirá tus datos, tu cuota de autónomos y tus suscripciones, conectará el correo para los gastos si quieres y te enseñará el admin en tu ordenador.
 3. Para tenerlo en tu dominio, con los espacios de cliente: [docs/instalar.md](docs/instalar.md). Con `python backoffice.py cloudflare` es un comando y un par de clics.
 
 Para comprobar en cualquier momento que todo está en su sitio: `python backoffice.py doctor`.
@@ -54,7 +57,7 @@ En PowerShell: `$env:BACKOFFICE_DATOS="demo"; python backoffice.py servir`. Se a
 
 ## Cómo se usa
 
-Le hablas a Claude Code y él usa estas skills:
+Le hablas a tu agente y él usa estas skills:
 
 | Skill | Le dices… |
 |---|---|
@@ -62,6 +65,7 @@ Le hablas a Claude Code y él usa estas skills:
 | `backoffice` | «nuevo cliente: …», «he terminado la Fase 1 de Acme», «hoy 3 h con Acme», «¿qué me deben?» |
 | `factura` | «factura a Acme la Fase 1», «me ha pagado Acme», «la 2026-004 está mal» |
 | `gasto` | «apunta este gasto» (con el PDF), «revisa los gastos del correo», «¿cuánto aparto este trimestre?», «cierra el 4T» |
+| `trabajo` | «monta las fases de Acme», «escribe la presentación para la reunión», «marca el diseño como revisado», «comparte el proyecto con el cliente» |
 | `espacio` | «hazle una propuesta a Panadería Lola», «actualiza el espacio de Acme», «dale acceso a Ana» |
 | `melso` | «conecta Melso», «manda lo pendiente a Melso» |
 | `mantener` | «¿hay versión nueva?», «haz una copia de mis datos», «¿está todo bien?» |
@@ -82,13 +86,13 @@ También **compara el 303**: pone tu estimación al lado de la que ha calculado 
 
 Las facturas se siguen emitiendo aquí, con tu numeración. El backoffice no emite facturas en Melso, ni aprueba o presenta impuestos, ni borra nada allí: eso lo haces tú en Melso.
 
-Se conecta con el servidor MCP de Melso. Entras con tu cuenta de Melso y no hay ninguna clave en el repo:
+Se conecta con el servidor MCP de Melso (`https://mcp.melso.ai/mcp`, por HTTP). Entras con tu cuenta de Melso y no hay ninguna clave en el repo. Añádelo a tu agente como cualquier otro servidor MCP; en Claude Code, por ejemplo:
 
 ```
 claude mcp add --transport http melso https://mcp.melso.ai/mcp
 ```
 
-Después, en Claude Code, escribe `/mcp`, elige **melso** y autentícate. Luego dile «conecta Melso»: te preguntará desde qué fecha te lleva Melso los impuestos, porque lo anterior no se manda. A partir de ahí, «manda lo pendiente a Melso». El admin te avisa cuando hay algo por mandar, y `python backoffice.py melso pendiente` te lo enseña en la terminal.
+y después `/mcp`, eliges **melso** y te autenticas. Luego dile a tu agente «conecta Melso»: te preguntará desde qué fecha te lleva Melso los impuestos, porque lo anterior no se manda. A partir de ahí, «manda lo pendiente a Melso». El admin te avisa cuando hay algo por mandar, y `python backoffice.py melso pendiente` te lo enseña en la terminal.
 
 Lo que se ha mandado, y con qué id quedó en Melso, se guarda en `datos/melso.json`.
 
@@ -97,6 +101,7 @@ Lo que se ha mandado, y con qué id quedó en Melso, se guarda en `datos/melso.j
 ## Documentación
 
 - [Publicar en Cloudflare](docs/instalar.md)
+- [Proyectos por fases](docs/trabajo.md)
 - [Gastos del correo](docs/gastos-correo.md)
 - [Melso](docs/melso.md)
 - [Actualizar](docs/actualizar.md)
@@ -107,11 +112,12 @@ Lo que se ha mandado, y con qué id quedó en Melso, se guarda en `datos/melso.j
 
 ## Seguridad
 
-- El repo tiene que ser privado. `doctor` lo comprueba.
+- El repo tiene que ser privado: guarda tus datos fiscales y tus facturas. `doctor` lo comprueba.
 - `/admin/` está detrás de Cloudflare Access (entras con tu email) y de una segunda comprobación en el servidor. Si falta configuración, responde 403: nunca queda abierto.
-- Cada espacio se abre solo con un enlace personal. La clave se enseña una vez y en el repo solo queda su SHA-256. Quitarle el enlace a alguien no afecta a los demás.
-- Claude Code no puede reescribir la historia de git ni editar a mano una factura emitida (`.claude/settings.json`), y GitHub rechaza la publicación si una factura emitida ha cambiado.
-- Los tokens (Cloudflare, GitHub) los escribes tú en la terminal. No pasan por el chat ni se guardan en el repo.
+- Cada espacio se abre solo con un enlace personal. La clave se enseña una vez y en el repo solo queda su huella. Quitarle el enlace a alguien no afecta a los demás.
+- Si un push cambia una factura emitida, GitHub no publica. Esto vale uses el agente que uses.
+- En Claude Code, `.claude/settings.json` además le impide reescribir la historia de git o editar a mano una factura emitida. Si usas otro agente, ponle reglas parecidas en sus permisos.
+- Los tokens (Cloudflare, GitHub) los escribes tú en la terminal, nunca en el chat del agente. No se guardan en el repo.
 - Todo se sirve con `noindex` y sin `Referer`.
 
 ## Aviso
@@ -122,4 +128,4 @@ Freelance Backoffice es software libre y se ofrece tal cual, sin garantía (ver 
 
 ## Licencia
 
-MIT. Lo hace [Borja Pérez Francés](https://borjaperezfrances.com), que lleva así su propio negocio.
+MIT. Hecho por [@borjaperfra](https://github.com/borjaperfra).

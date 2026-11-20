@@ -25,8 +25,8 @@ if hasattr(sys.stdout, "reconfigure"):
 def cargar(datos):
     """Importa backoffice (y sus módulos) apuntando a otra carpeta de datos."""
     os.environ["BACKOFFICE_DATOS"] = str(datos)
-    import backoffice, conectores, mantenimiento
-    for m in (backoffice, conectores, mantenimiento):
+    import backoffice, conectores, mantenimiento, trabajo
+    for m in (backoffice, conectores, mantenimiento, trabajo):
         importlib.reload(m)
     return backoffice, conectores, mantenimiento
 
@@ -246,6 +246,88 @@ class FacturasQueNoSeTocan(unittest.TestCase):
         (self.tmp / "datos/facturas/2026/2026-099.json").write_text("{}", encoding="utf-8")
         subprocess.run(["git", "add", "."], cwd=self.tmp, check=True)
         self.assertEqual(self.bo.facturas_tocadas("HEAD"), [])
+
+
+class Trabajo(ConDemo):
+    """El trabajo de un proyecto (datos/trabajo/): revisar, el admin, la página del cliente y los enlaces."""
+
+    def setUp(self):
+        import trabajo
+        self.tr = trabajo
+        self.base = self.datos / "trabajo" / "acme-robotica-web"
+
+    def test_la_demo_esta_bien(self):
+        self.assertEqual(self.bo.problemas(desde=None), [])
+        e = self.tr.cargar("acme-robotica-web")
+        self.assertEqual(e["espacio"]["fase_actual"], "diseno")
+        docs = {d["id"]: d for d in e["documentos"]}
+        # 02-diseno sustituye al borrador: el borrador pasa a «sustituido» y apunta al nuevo
+        self.assertEqual((docs["02-diseno-borrador"]["estado"], docs["02-diseno-borrador"]["sustituido_por"]), ("sustituido", "02-diseno"))
+        self.assertTrue(all(d["al_dia"] and d["pagina"] and d["pdf"] for d in docs.values()))
+        self.assertIn("que-hacen-antes-de-llamar", [a["id"] for a in docs["01-investigacion"]["anclas"]])
+
+    def test_un_documento_cambiado_sin_regenerar_es_un_problema(self):
+        f = self.base / "documentos" / "01-investigacion.md"
+        antes = f.read_text(encoding="utf-8")
+        try:
+            f.write_text(antes + "\nUna línea más.\n", encoding="utf-8")
+            self.assertTrue(any("01-investigacion" in x and "documentos acme-robotica-web" in x for x in self.tr.problemas()))
+        finally:
+            f.write_text(antes, encoding="utf-8")
+
+    def test_cabecera_y_estados_que_no_valen(self):
+        f = self.tmp / "malo.md"
+        f.write_text("---\ntitulo: X\nformato: libro\nversion: 1\nestado: borrador\nfecha: 2026-11-20\n---\nHola", encoding="utf-8")
+        with self.assertRaises(self.tr.Invalido):
+            self.tr.leer_documento(f)
+        x = self.base / "entregables" / "01.json"
+        antes = x.read_text(encoding="utf-8")
+        try:
+            x.write_text(antes.replace('"aprobado"', '"approved"'), encoding="utf-8")
+            self.assertTrue(any("entregable 01" in e for e in self.tr.problemas()))
+        finally:
+            x.write_text(antes, encoding="utf-8")
+
+    def test_columnas_y_portada_en_las_diapositivas(self):
+        html = self.tr._md('# Portada\n\n<div class="cols c2" markdown="1">\n<div markdown="1">\n### Uno\nTexto **fuerte**.\n</div>\n</div>', h1=True)
+        self.assertIn("<h1>Portada</h1>", html)
+        self.assertIn('<div class="cols c2"><div><h3 id="uno">Uno</h3><p>Texto <strong>fuerte</strong>.</p></div></div>', html)
+
+    def test_admin_y_pagina_del_cliente(self):
+        dest = self.tmp / "admin"
+        with mock.patch("builtins.print"):
+            self.bo.build(dest)
+        datos = json.loads((dest / "datos.json").read_text(encoding="utf-8"))
+        self.assertIn("acme-robotica-web", datos["trabajo"])
+        self.assertIn("acme-web", [e["slug"] for e in datos["espacios"]])
+        self.assertTrue((dest / "trabajo" / "acme-robotica-web" / "02-diseno.html").exists())
+        c = self.tmp / "c" / "acme-web"
+        self.tr.pagina_cliente(c, "acme-robotica-web", self.tr.para_admin())
+        cliente = json.loads((c / "datos.json").read_text(encoding="utf-8"))
+        # Solo ese proyecto, sin facturas, clientes ni a quién se ha dado acceso
+        self.assertEqual(set(cliente), {"generado", "negocio", "trabajo"})
+        self.assertEqual(list(cliente["trabajo"]), ["acme-robotica-web"])
+        self.assertIsNone(cliente["trabajo"]["acme-robotica-web"]["compartir"])
+        self.assertNotIn("compartir", cliente["trabajo"]["acme-robotica-web"]["espacio"])
+        self.assertIn(self.tr.MARCA, (c / "index.html").read_text(encoding="utf-8"))
+        for f in ("assets/trabajo.js", "assets/cliente.js", "trabajo/acme-robotica-web/00-estado-v1.0.pdf"):
+            self.assertTrue((c / f).is_file(), f)
+        self.assertFalse((c / "trabajo" / "acme-robotica-web" / "indice.json").exists())
+
+    def test_enlace_al_proyecto_compartido(self):
+        acc = self.datos / "espacios" / "accesos.json"
+        antes = acc.read_text(encoding="utf-8")
+        try:
+            with self.argv("enlace", "acme-robotica-web", "Luis Gil"), mock.patch("builtins.print") as dijo:
+                self.bo.enlace()
+            self.assertIn("/c/acme-web/?k=", " ".join(str(a) for c in dijo.call_args_list for a in c.args))
+            self.assertIn("Luis Gil", [a["nombre"] for a in self.bo.accesos()["acme-web"]])
+            with self.argv("revocar", "acme-web", "Luis Gil"), mock.patch("builtins.print"):
+                self.bo.revocar()
+            self.assertNotIn("Luis Gil", [a["nombre"] for a in self.bo.accesos()["acme-web"]])
+            self.assertEqual(self.bo.problemas(desde=None), [])
+        finally:
+            acc.write_text(antes, encoding="utf-8")
 
 
 class Mantenimiento(ConDemo):

@@ -25,8 +25,9 @@ el admin (dist/sitio/admin/) y los espacios privados de cliente (dist/sitio/c/<s
     python backoffice.py banco <extracto.csv>    cruza el extracto del banco con facturas y gastos
     python backoffice.py semana                  resumen de la semana en Markdown
 
-    python backoffice.py enlace <espacio> "Nombre"   enlace personal a un espacio de cliente
+    python backoffice.py enlace <espacio> "Nombre"   enlace personal a un espacio de cliente (o a un proyecto compartido)
     python backoffice.py revocar <espacio> "Nombre"  le quita el acceso
+    python backoffice.py documentos <proyecto> [id…] hace la página y el PDF de los documentos del proyecto que han cambiado
 
     python backoffice.py correo [hecho]          qué buscar en el correo para los gastos; "hecho" apunta que ya está
     python backoffice.py melso [pendiente]       lo que falta por mandar a Melso (ver docs/melso.md)
@@ -56,7 +57,7 @@ import subprocess
 import sys
 from decimal import ROUND_HALF_UP, Decimal
 
-VERSION = "0.2.4"      # la del código; actualizar la compara con la del repo original
+VERSION = "0.3.0"      # la del código; actualizar la compara con la del repo original
 DATOS_VERSION = 1      # la del formato de datos/; si sube, hace falta una migración en mantenimiento.py
 
 ROOT = pathlib.Path(__file__).resolve().parent
@@ -282,8 +283,9 @@ def problemas(desde="HEAD"):
             errores.append(f"espacio {sid}: tipo tiene que ser propuesta o proyecto")
         if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", sid):
             errores.append(f"espacio {sid}: el nombre de la carpeta solo puede llevar minúsculas, números y guiones")
+    import trabajo
     for sid in accesos():
-        if sid not in espacios():
+        if sid not in espacios() and sid not in trabajo.compartidos():
             errores.append(f"accesos.json: hay enlaces a {sid!r}, que no existe")
     # Gastos: campos, que las cifras fiscales cuadren con lo que calcula el script y que el archivo exista
     vistos = {}
@@ -310,6 +312,7 @@ def problemas(desde="HEAD"):
             errores.append(f"gasto {gid}: parece repetido con {vistos[clave]}")
         vistos[clave] = gid
     errores += problemas_recurrentes()
+    errores += trabajo.problemas()
     return errores
 
 
@@ -1636,6 +1639,13 @@ def build_sitio():
     shutil.rmtree(SITIO, ignore_errors=True)
     build(DIST)
     hechos = build_espacios(SITIO / "c")
+    # Los proyectos compartidos: /c/<slug>/ con el trabajo entero, como en el admin
+    import trabajo
+    todo = trabajo.para_admin()
+    for slug_c, p in trabajo.compartidos().items():
+        if p in todo and slug_c not in hechos:
+            trabajo.pagina_cliente(SITIO / "c" / slug_c, p, todo)
+            hechos.append(slug_c)
     # Vista previa para ti, dentro del admin (detrás de Access): /admin/espacios/<slug>/
     for h in hechos:
         shutil.copytree(SITIO / "c" / h, DIST / "espacios" / h)
@@ -1663,9 +1673,14 @@ def enlace():
 
     if len(sys.argv) < 4:
         sys.exit('Uso: python backoffice.py enlace <espacio> "Nombre de la persona"')
+    import trabajo
     esp, nombre = sys.argv[2], sys.argv[3]
-    if esp not in espacios():
-        sys.exit(f"No existe el espacio {esp!r} (datos/espacios/{esp}/index.md)")
+    compartidos = trabajo.compartidos()
+    por_proyecto = {p: s for s, p in compartidos.items()}
+    esp = por_proyecto.get(esp, esp)   # vale también el slug del proyecto
+    if esp not in espacios() and esp not in compartidos:
+        sys.exit(f"No existe el espacio {esp!r} (datos/espacios/{esp}/index.md) ni un proyecto compartido con ese slug "
+                 '("compartir": {"slug": …} en datos/trabajo/<proyecto>/espacio.json)')
     clave = secrets.token_urlsafe(18)
     todos = accesos()
     todos.setdefault(esp, []).append({"nombre": nombre, "hash": hashlib.sha256(clave.encode()).hexdigest(), "creado": hoy()})
@@ -1682,7 +1697,9 @@ def revocar():
     """python backoffice.py revocar <espacio> "Nombre": quita sus enlaces."""
     if len(sys.argv) < 4:
         sys.exit('Uso: python backoffice.py revocar <espacio> "Nombre"')
+    import trabajo
     esp, nombre = sys.argv[2], sys.argv[3]
+    esp = {p: s for s, p in trabajo.compartidos().items()}.get(esp, esp)
     todos = accesos()
     antes = len(todos.get(esp, []))
     todos[esp] = [a for a in todos.get(esp, []) if a["nombre"].lower() != nombre.lower()]
@@ -1724,6 +1741,15 @@ def build(dest=DIST):
             "accesos": [{"nombre": a["nombre"], "creado": a.get("creado")} for a in accesos().get(e["slug"], [])]}
             for e in espacios().values()],
     }
+    import trabajo
+    datos["trabajo"] = trabajo.para_admin()
+    for slug_c, p in trabajo.compartidos().items():
+        t = datos["trabajo"].get(p)
+        if t:
+            datos["espacios"].append({"slug": slug_c, "titulo": t["espacio"]["titulo"], "tipo": "proyecto entero",
+                                      "proyecto": p, "cliente": (proyectos().get(p) or {}).get("cliente"),
+                                      "accesos": t["compartir"]["accesos"]})
+    trabajo.copiar(dest)
     datos["meses_zip"] = []
     for m in sorted({x["fecha"][:7] for x in datos["facturas"] + datos["gastos"]}):
         if zip_mes(m, dest / "meses" / f"gestoria-{m}.zip") or (dest / "meses" / f"gestoria-{m}.zip").exists():
@@ -1813,6 +1839,7 @@ if __name__ == "__main__":
             flujo.reconfigure(encoding="utf-8")
     import conectores
     import mantenimiento
+    import trabajo
 
     def version():
         v = negocio().get("version", 0) if (DATOS / "negocio.json").exists() else "sin datos"
@@ -1825,7 +1852,7 @@ if __name__ == "__main__":
               "correo": conectores.correo, "melso": conectores.melso,
               "doctor": mantenimiento.doctor, "actualizar": mantenimiento.actualizar, "migrar": mantenimiento.migrar,
               "copia": mantenimiento.copia, "restaurar": mantenimiento.restaurar, "cloudflare": mantenimiento.cloudflare,
-              "proteger": mantenimiento.proteger, "wrangler": mantenimiento.wrangler, "version": version}
+              "documentos": trabajo.comando, "proteger": mantenimiento.proteger, "wrangler": mantenimiento.wrangler, "version": version}
     tarea = tareas.get(sys.argv[1] if len(sys.argv) > 1 else "")
     if not tarea:
         print(__doc__)

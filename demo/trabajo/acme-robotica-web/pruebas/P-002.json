@@ -1,0 +1,14 @@
+{
+  "id": "P-002",
+  "nombre": "Comparar tres modelos",
+  "estado": "hecha",
+  "fecha": "2026-11-14",
+  "objetivo": "Ver si el comparador sirve para elegir entre tres robots.",
+  "hipotesis": "Con la casilla «Comparar» en cada ficha basta.",
+  "esperado": "Que lleguen a la tabla con los tres modelos.",
+  "observado": "Tres de cinco se quedaron en dos modelos: pensaban que no se podía añadir otro.",
+  "funciono": "La tabla, una vez dentro, se entiende bien.",
+  "fricciones": "La casilla «Comparar» parece de una sola vez y el límite no se explica.",
+  "implicaciones": "Rehacer el comparador como una bandeja fija abajo que va sumando modelos.",
+  "notas": ""
+}

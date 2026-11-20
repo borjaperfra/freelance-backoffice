@@ -1,0 +1,17 @@
+{
+  "codigo": "D-005",
+  "titulo": "Quitar el catálogo en PDF",
+  "estado": "propuesta",
+  "fecha": "2026-11-18",
+  "responsable": "Lucía Ferrer",
+  "descripcion": "Todo el catálogo pasa a la web. El PDF se genera bajo pedido desde cada ficha.",
+  "justificacion": "El 70 % de las descargas son desde el móvil y el PDF no se puede leer ahí.",
+  "riesgos": "Algunos distribuidores lo reenvían por email tal cual.",
+  "documentos": [
+    "01-investigacion"
+  ],
+  "entregables": [
+    "02",
+    "04"
+  ]
+}

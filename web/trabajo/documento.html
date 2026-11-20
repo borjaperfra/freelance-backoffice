@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITULO}} · {{PROYECTO}}</title>
+<!-- Documento privado. Lo genera trabajo.py desde su .md (python backoffice.py documentos): no se edita a mano. -->
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='12' fill='none' stroke='%23000' stroke-width='2.5'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+if (window.parent !== window) document.documentElement.classList.add('enmarcado');
+try { var t = sessionStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<link rel="stylesheet" href="assets/documento.css">
+<style>@page documento { @bottom-left { content: "{{PIE}}"; } }</style>
+</head>
+<body class="{{FORMATO}}">
+<div class="progress" aria-hidden="true"><span></span></div>
+
+<header class="pb-top">
+  <span class="brand">{{MARCA}}</span>
+  <span class="pb-name">{{PROYECTO}} · {{TITULO}}</span>
+  <span class="pb-tools">
+    {{HERRAMIENTAS}}
+    <button id="mode" type="button" aria-label="Cambiar entre modo claro y oscuro">Modo_<span class="o"></span>SCURO</button>
+  </span>
+</header>
+
+<main>
+{{CUERPO}}
+</main>
+
+<footer class="pb-foot">
+  <span>© {{ANYO}} {{MARCA}}</span>
+  <span>{{PROYECTO}} · {{TITULO}} · v{{VERSION}}</span>
+  <span>Documento privado</span>
+</footer>
+
+<script src="assets/documento.js"></script>
+</body>
+</html>

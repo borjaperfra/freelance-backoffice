@@ -2,6 +2,16 @@
 
 Cada versión, con lo que trae y si hay que hacer algo al actualizar. `python backoffice.py actualizar` enseña la sección de la versión nueva antes de instalarla.
 
+## 0.3.0 · 2026-11-20
+
+No hay que hacer nada al actualizar: lo nuevo solo se activa en los proyectos que tengan `datos/trabajo/<proyecto>/`.
+
+- **Proyectos por fases** (`datos/trabajo/`, skill `trabajo`): fases con la actual marcada, entregables como carpetas, documentos en Markdown que salen como presentación 16:9 o documento con índice, con su PDF y sus versiones, decisiones, pruebas, un resumen por capítulos y un buscador. Todo se abre en un visor con «Volver» y «Cerrar». Ver `docs/trabajo.md`.
+- `python backoffice.py documentos <proyecto>` hace la página y el PDF de los documentos que han cambiado. `revisar` avisa si falta alguno.
+- Con `"compartir": {"slug": …}`, el cliente ve el proyecto entero en `/c/<slug>/`, igual que en el admin y en solo lectura, con los mismos enlaces personales (`enlace`, `revocar`).
+- La demo trae un proyecto de ejemplo: la web nueva de Acme Robótica.
+- El README y el admin hablan de «tu agente de código»: vale Claude Code, Pi, Codex, OpenCode u otro. `AGENTS.md` lleva a los agentes que lo leen hasta `CLAUDE.md` y las skills.
+
 ## 0.2.4 · 2026-11-20
 
 - `cloudflare`: la pregunta de «pulsa Enter» ya no enseña lo que se escribe, y si pegas ahí el token también vale.

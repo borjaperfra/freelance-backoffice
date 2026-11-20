@@ -1,4 +1,5 @@
-// Freelance Backoffice: pinta datos.json. Solo lee; los cambios se hacen con Claude Code y backoffice.py.
+// Freelance Backoffice: pinta datos.json. Solo lee; los cambios se hacen con tu agente de código y backoffice.py.
+// El trabajo de cada proyecto (fases, entregables, documentos) está en trabajo.js, que se engancha con window.Admin.
 (function () {
   var D, app = document.getElementById('app');
 
@@ -112,7 +113,7 @@
     var html = '<h1>' + saludo + '</h1><p class="sub">' + fecha(hoy) + ' · ' + t + '</p>';
 
     if ((D.pendientes || []).length) {
-      html += '<h2>Lo que falta <small>díselo a Claude Code</small></h2><ul class="falta">' + D.pendientes.map(function (p) {
+      html += '<h2>Lo que falta <small>díselo a tu agente</small></h2><ul class="falta">' + D.pendientes.map(function (p) {
         return '<li><span>' + esc(p.texto) + '</span><code>' + esc(p.pide) + '</code></li>';
       }).join('') + '</ul>';
     }
@@ -178,7 +179,7 @@
     html += '<h2>Proyectos activos <small>' + activos.length + '</small></h2>' + tablaProyectos(activos, 'Ningún proyecto activo.');
     if (abiertas.length) html += '<h2>Propuestas en el aire <small>' + eur(suma(abiertas, 'precio')) + '</small></h2>' + tablaProyectos(abiertas);
 
-    html += pista('Para cambiar algo, díselo a Claude Code: <code>factura a Acme la Fase 1</code>, ' +
+    html += pista('Para cambiar algo, díselo a tu agente: <code>factura a Acme la Fase 1</code>, ' +
       '<code>me ha pagado Acme</code>, <code>nuevo cliente…</code>, <code>¿cuánto llevo este trimestre?</code>');
     return html;
   };
@@ -212,7 +213,7 @@
               eur(suma(fs, 'base')), eur(suma(fs.filter(function (f) { return f.estado === 'emitida'; }), 'total'))]
           };
         }), 'Aún no hay clientes.') +
-      pista('Dile a Claude Code <code>nuevo cliente: …</code> y pásale lo que tengas: su web, la firma de un email, el PDF de una factura suya.');
+      pista('Dile a tu agente <code>nuevo cliente: …</code> y pásale lo que tengas: su web, la firma de un email, el PDF de una factura suya.');
   };
 
   V.cliente = function (slug) {
@@ -256,7 +257,7 @@
     var html = '<h1>Espacios</h1><p class="sub">Páginas privadas para tus clientes: propuestas, seguimiento de proyectos y entregables. ' +
       'Cada persona entra con su enlace.</p>';
     html += tablaEspacios(D.espacios || [], 'Aún no hay espacios.');
-    return html + pista('Dile a Claude Code <code>hazle a Acme un espacio con la propuesta</code> o ' +
+    return html + pista('Dile a tu agente <code>hazle a Acme un espacio con la propuesta</code> o ' +
       '<code>dale acceso a Ana al espacio de Acme</code>. «Ver» abre tu copia, dentro del admin; ' +
       'tu cliente la ve en /c/… con su enlace.');
   };
@@ -279,7 +280,7 @@
       var lista = D.proyectos.filter(function (p) { return p.estado === g[0]; });
       if (filtro || lista.length || g[0] === 'activo') html += '<h2>' + g[1] + ' <small>' + lista.length + '</small></h2>' + tablaProyectos(lista, 'Ninguno.');
     });
-    return html + pista('Dile a Claude Code <code>nuevo proyecto para Acme</code>, o pásale la propuesta y sacará de ahí los hitos y el precio.');
+    return html + pista('Dile a tu agente <code>nuevo proyecto para Acme</code>, o pásale la propuesta y sacará de ahí los hitos y el precio.');
   };
 
   V.proyecto = function (slug) {
@@ -292,6 +293,7 @@
       ['Facturado', eur(fact) + (p.precio ? ' (' + pct + '%)<div class="barra"><i style="width:' + pct + '%"></i></div>' : '')],
       ['Inicio', fecha(p.inicio)], ['Fin', fecha(p.fin)]
     ]);
+    if (Admin.bloqueProyecto) html += Admin.bloqueProyecto(slug);
     var esp = (D.espacios || []).filter(function (e) { return e.proyecto === slug; });
     if (esp.length) html += '<h2>Espacio del cliente</h2>' + tablaEspacios(esp);
     if ((p.enlaces || []).length) {
@@ -323,7 +325,7 @@
       }
       html += tabla([{ t: 'Fecha' }, { t: 'Nota', cls: 'opc' }, { t: 'Horas', cls: 'n' }],
         (p.horas || []).slice().reverse().slice(0, 10).map(function (h) { return { celdas: [fecha(h.fecha), esc(h.nota || ''), hh(h.horas)] }; }),
-        'Aún no hay horas. Dile a Claude Code: hoy 3 h con este cliente.');
+        'Aún no hay horas. Dile a tu agente: hoy 3 h con este cliente.');
     }
     if (p.enviada && p.estado === 'propuesta') {
       html += '<p class="pista">Propuesta enviada el ' + fecha(p.enviada) + (p.ultimo_contacto ? ', último contacto el ' + fecha(p.ultimo_contacto) : '') + '.</p>';
@@ -461,7 +463,7 @@
             eur(g.base), eur(g.iva_deducible), linkArchivo(g)]
         };
       }), 'Ningún gasto en ' + anyo + '.');
-    return html + pista('Pásale a Claude Code el PDF o la foto de una factura: <code>apunta este gasto</code>. ' +
+    return html + pista('Pásale a tu agente el PDF o la foto de una factura: <code>apunta este gasto</code>. ' +
       'Los fijos (cuota de autónomos, suscripciones) se apuntan solos cada mes.');
   };
 
@@ -522,17 +524,26 @@
   var pintar = function () {
     var partes = (location.hash.slice(1) || 'hoy').split('/');
     var vista = V[partes[0]] ? partes[0] : 'hoy';
-    app.innerHTML = V[vista](decodeURIComponent(partes[1] || ''));
-    var seccion = { cliente: 'clientes', proyecto: 'proyectos', factura: 'facturas', trimestre: 'trimestres' }[vista] || vista;
+    document.body.classList.remove('presentando');
+    app.innerHTML = V[vista].apply(null, partes.slice(1).map(function (x) { return decodeURIComponent(x); }).concat(['', '']));
+    var seccion = ({ cliente: 'clientes', proyecto: 'proyectos', factura: 'facturas', trimestre: 'trimestres' })[vista] || Admin.seccion[vista] || vista;
     document.querySelectorAll('nav a').forEach(function (a) { a.classList.toggle('on', a.dataset.v === seccion); });
     document.title = (app.querySelector('h1') || {}).textContent + ' · ' + ((D.negocio || {}).nombre || 'Backoffice');
-    window.scrollTo(0, 0);
+    if (Admin.despues) Admin.despues(vista);
+    if (!Admin.mantenerScroll) window.scrollTo(0, 0);
+    Admin.mantenerScroll = false;
   };
   app.addEventListener('click', function (e) {
     var tr = e.target.closest('tr[data-href]');
     if (tr && !e.target.closest('a')) location.hash = tr.dataset.href;
   });
   window.addEventListener('hashchange', pintar);
+
+  // Lo que necesita trabajo.js (y la página del cliente, con su propio cliente.js)
+  var Admin = window.Admin = {
+    V: V, esc: esc, fecha: fecha, hoy: hoy, pintar: pintar, seccion: {},
+    datos: function () { return D; }, proyecto: proyecto
+  };
 
   fetch('datos.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
     D = d;

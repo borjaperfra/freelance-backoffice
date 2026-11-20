@@ -4,8 +4,8 @@ El backoffice de un autónomo en este repo. Tú (Claude Code) eres quien mete lo
 
 - Datos: JSON en `datos/` (formato en `docs/datos.md`). Con `BACKOFFICE_DATOS=demo`, los de ejemplo de `demo/`.
 - Motor: `python backoffice.py` (solo biblioteca estándar; Chrome para los PDF). Sin argumentos, lista los comandos.
-- Skills: `configurar` (primera vez, y el correo de los gastos), `backoffice` (clientes, proyectos, horas, preguntas), `factura`, `gasto` (gastos, gastos fijos, trimestres, ZIP para la gestoría), `espacio` (propuestas y espacios privados para clientes), `melso` (mandar facturas y gastos a Melso) y `mantener` (actualizar, copias, doctor).
-- Código: `backoffice.py` (motor), `mantenimiento.py` (actualizar, migrar, copias, doctor, Cloudflare), `conectores.py` (correo y Melso). Tests en `tests/`.
+- Skills: `configurar` (primera vez, y el correo de los gastos), `backoffice` (clientes, proyectos, horas, preguntas), `factura`, `gasto` (gastos, gastos fijos, trimestres, ZIP para la gestoría), `espacio` (propuestas y espacios privados para clientes), `trabajo` (fases, entregables, documentos, decisiones y pruebas de un proyecto, en `datos/trabajo/`), `melso` (mandar facturas y gastos a Melso) y `mantener` (actualizar, copias, doctor).
+- Código: `backoffice.py` (motor), `trabajo.py` (el trabajo de cada proyecto y sus documentos), `mantenimiento.py` (actualizar, migrar, copias, doctor, Cloudflare), `conectores.py` (correo y Melso). Tests en `tests/`.
 
 ## Reglas
 

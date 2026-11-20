@@ -1,0 +1,16 @@
+{
+  "codigo": "D-001",
+  "titulo": "Inter para todo, sin segunda familia",
+  "estado": "aprobada",
+  "fecha": "2026-11-03",
+  "responsable": "Ana Ríos",
+  "descripcion": "Una sola tipografía en la web y en el catálogo.",
+  "justificacion": "Se lee bien en pantalla, tiene números tabulares para las fichas técnicas y no hay que pagar licencia.",
+  "riesgos": "",
+  "documentos": [
+    "02-diseno"
+  ],
+  "entregables": [
+    "02"
+  ]
+}

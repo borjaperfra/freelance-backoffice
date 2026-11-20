@@ -111,6 +111,10 @@ El resumen PDF y los libros en Excel de cada trimestre cerrado (`python backoffi
 
 Un espacio privado para un cliente: cabecera `clave: valor` y el texto en Markdown. El resto de archivos de la carpeta se publican con él. Formato y uso en `.claude/skills/espacio/SKILL.md`.
 
+## trabajo/<proyecto>/
+
+El trabajo de un proyecto por fases: fases, entregables, documentos en Markdown con su página y su PDF, decisiones y pruebas. Formato completo en [trabajo.md](trabajo.md).
+
 ## espacios/accesos.json
 
 Quién entra en cada espacio: `{slug: [{nombre, hash, creado}]}`. Lo escriben `python backoffice.py enlace` y `revocar`. Solo guarda el SHA-256 de cada clave.

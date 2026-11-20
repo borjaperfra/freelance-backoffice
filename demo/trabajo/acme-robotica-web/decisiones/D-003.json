@@ -1,0 +1,12 @@
+{
+  "codigo": "D-003",
+  "titulo": "El blog se queda fuera de esta fase",
+  "estado": "aprobada",
+  "fecha": "2026-11-10",
+  "responsable": "Lucía Ferrer",
+  "descripcion": "",
+  "justificacion": "Nadie en Acme tiene tiempo para escribir con regularidad todavía.",
+  "riesgos": "",
+  "documentos": [],
+  "entregables": []
+}

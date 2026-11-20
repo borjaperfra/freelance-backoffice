@@ -1,0 +1,105 @@
+{
+  "titulo": "Web nueva de Acme Robótica",
+  "descripcion": "Rediseño de la web: de catálogo en PDF a una web que vende sola.",
+  "estado": "en_curso",
+  "fases": [
+    {
+      "id": "descubrimiento",
+      "nombre": "Descubrimiento",
+      "estado": "hecha"
+    },
+    {
+      "id": "diseno",
+      "nombre": "Diseño",
+      "estado": "en_curso"
+    },
+    {
+      "id": "desarrollo",
+      "nombre": "Desarrollo",
+      "estado": "pendiente"
+    },
+    {
+      "id": "lanzamiento",
+      "nombre": "Lanzamiento",
+      "estado": "pendiente"
+    }
+  ],
+  "fase_actual": "diseno",
+  "proximo_hito": {
+    "texto": "Aprobar el diseño de las 12 plantillas",
+    "fecha": "2026-12-02"
+  },
+  "reunion": {
+    "fecha": "2026-12-02",
+    "presentacion": "00-estado"
+  },
+  "dossier": "01-investigacion",
+  "resumen": {
+    "frase": "Los compradores de Acme deciden antes de llamar: la web tiene que contestarles sin una visita comercial.",
+    "entradilla": "Cómo está el proyecto a 20 de noviembre de 2026.",
+    "capitulos": [
+      {
+        "titulo": "Lo que sabemos",
+        "entradilla": "Seis entrevistas con clientes y la analítica de un año.",
+        "puntos": [
+          {
+            "titulo": "Comparan antes de llamar",
+            "texto": "Cinco de los seis entrevistados habían descartado a dos proveedores antes de pedir presupuesto. Lo hicieron con la web y el PDF del catálogo.",
+            "ref": {
+              "doc": "01-investigacion",
+              "ancla": "que-hacen-antes-de-llamar",
+              "texto": "Investigación · Qué hacen antes de llamar"
+            }
+          },
+          {
+            "titulo": "El catálogo en PDF frena",
+            "texto": "Es lo más descargado de la web, pero el 70 % de las descargas se hace desde el móvil, donde no se puede leer bien.",
+            "ref": {
+              "doc": "01-investigacion",
+              "ancla": "el-catalogo",
+              "texto": "Investigación · El catálogo"
+            }
+          },
+          {
+            "titulo": "Falta el precio orientativo",
+            "texto": "Todos lo pidieron. Sin una horquilla, la primera llamada sirve solo para saber si están en presupuesto.",
+            "ref": {
+              "doc": "01-investigacion",
+              "ancla": "precio",
+              "texto": "Investigación · Precio"
+            }
+          }
+        ]
+      },
+      {
+        "titulo": "Lo que hemos probado",
+        "entradilla": "Dos pruebas con el prototipo navegable, con clientes reales.",
+        "puntos": [
+          {
+            "titulo": "La ficha de producto funciona",
+            "texto": "Los cinco participantes encontraron la carga útil y el alcance del robot en menos de 30 segundos."
+          },
+          {
+            "titulo": "El comparador confunde",
+            "texto": "Tres de cinco no entendieron que podían comparar más de dos modelos. Hay que rehacerlo antes del desarrollo."
+          }
+        ]
+      },
+      {
+        "titulo": "Lo que falta decidir",
+        "entradilla": "Dos decisiones que cambian el desarrollo. Mejor cerrarlas en la reunión del 2 de diciembre.",
+        "decisiones": true,
+        "aparte": {
+          "titulo": "Lo que todavía no sabemos",
+          "puntos": [
+            "Si el precio orientativo aumenta las peticiones de presupuesto o solo las filtra.",
+            "Cuánto tráfico llega desde fuera de España. La analítica no separa bien los países."
+          ]
+        }
+      }
+    ]
+  },
+  "compartir": {
+    "slug": "acme-web"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "id": "P-001",
+  "nombre": "Encontrar las especificaciones de un robot",
+  "estado": "hecha",
+  "fecha": "2026-11-12",
+  "objetivo": "Saber si la ficha de producto deja encontrar carga útil y alcance sin ayuda.",
+  "hipotesis": "Con la tabla técnica arriba, nadie necesita bajar al PDF.",
+  "esperado": "Menos de un minuto por persona.",
+  "observado": "Los cinco lo encontraron en menos de 30 segundos.",
+  "funciono": "La tabla técnica arriba, con las unidades en la cabecera.",
+  "fricciones": "Dos buscaron el peso del robot, que no está.",
+  "implicaciones": "Añadir el peso a la tabla técnica de todos los modelos.",
+  "notas": "Cinco clientes, por videollamada."
+}

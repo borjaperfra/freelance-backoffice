@@ -1,0 +1,14 @@
+{
+  "id": "P-003",
+  "nombre": "Pedir presupuesto desde el móvil",
+  "estado": "prevista",
+  "fecha": "2026-11-26",
+  "objetivo": "Comprobar que el formulario se rellena en el móvil en menos de dos minutos.",
+  "hipotesis": "",
+  "esperado": "",
+  "observado": "",
+  "funciono": "",
+  "fricciones": "",
+  "implicaciones": "",
+  "notas": ""
+}

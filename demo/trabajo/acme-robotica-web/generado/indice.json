@@ -1,0 +1,46 @@
+{
+  "00-estado": {
+    "huella": "268370586d0d8fd619281e2082fe24288eb6c5fb539ac7b294012ed12eef900e",
+    "versiones": [
+      {
+        "version": "1.0",
+        "fecha": "2026-11-20",
+        "pdf": "00-estado-v1.0.pdf",
+        "bytes": 212548
+      }
+    ]
+  },
+  "01-investigacion": {
+    "huella": "e3c9c998288c716505241350f0ef54d60c121a4026f064e1dc6596035ed18385",
+    "versiones": [
+      {
+        "version": "1.0",
+        "fecha": "2026-10-24",
+        "pdf": "01-investigacion-v1.0.pdf",
+        "bytes": 169549
+      }
+    ]
+  },
+  "02-diseno-borrador": {
+    "huella": "fa0e7bb19fcb2784f6b565cbcd0cefd18de9ab00461dc9b78e44f3ddd9cfa583",
+    "versiones": [
+      {
+        "version": "1.0",
+        "fecha": "2026-11-07",
+        "pdf": "02-diseno-borrador-v1.0.pdf",
+        "bytes": 84764
+      }
+    ]
+  },
+  "02-diseno": {
+    "huella": "353012509ae6137dcb17c6daa9e23bb60d783d3011d869504daef0bbec37418f",
+    "versiones": [
+      {
+        "version": "1.1",
+        "fecha": "2026-11-18",
+        "pdf": "02-diseno-v1.1.pdf",
+        "bytes": 129136
+      }
+    ]
+  }
+}

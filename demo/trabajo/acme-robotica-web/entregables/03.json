@@ -1,0 +1,9 @@
+{
+  "codigo": "03",
+  "titulo": "Pruebas con clientes",
+  "descripcion": "Lo que pasa cuando un cliente real usa el prototipo.",
+  "fase": "diseno",
+  "estado": "en_curso",
+  "tipo": "pruebas",
+  "sintesis": "La ficha de producto está lista. El comparador hay que rehacerlo: se entiende como una lista de dos, no como una tabla que crece."
+}
