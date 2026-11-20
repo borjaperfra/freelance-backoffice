@@ -1,4 +1,6 @@
 {
+  "version": 1,
+  "demo": true,
   "nombre": "Lucía Ferrer",
   "nif": "00000000T",
   "direccion": "Calle del Ejemplo, 1",

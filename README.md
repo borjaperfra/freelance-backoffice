@@ -2,22 +2,23 @@
 
 El backoffice de un autónomo en un repo de GitHub, con Claude Code como administrativo.
 
-Clientes, proyectos, propuestas, facturas, gastos y trimestres viven en archivos JSON y PDF de tu repo privado. Tú le dices a Claude Code lo que ha pasado ("factura a Acme la Fase 1", "apunta este gasto", "cierra el 4T") y él hace el trabajo con las skills de este repo. Una web minimalista te lo enseña todo, y tus clientes ven su propuesta o su proyecto en un espacio privado, cada persona con su enlace.
+Tus clientes, proyectos, propuestas, facturas, gastos y trimestres son archivos JSON y PDF en tu repo privado. Le cuentas a Claude Code lo que ha pasado («factura a Acme la Fase 1», «apunta este gasto», «cierra el 4T») y él hace el trabajo. Una web sencilla te lo enseña todo, y cada cliente ve su propuesta o su proyecto en una página privada, con un enlace personal.
 
-Funciona en Cloudflare Pages y GitHub Actions, en sus planes gratuitos. No hay base de datos ni cuenta en ningún SaaS: si mañana lo dejas, te quedas con tus archivos.
+Funciona con los planes gratuitos de Cloudflare y GitHub. No hay base de datos ni cuenta en ningún SaaS: si un día lo dejas, te quedas con tus archivos.
 
 ![El admin: lo que falta, lo que te deben y lo que tienes que apartar](docs/img/admin-hoy.png)
 
 ## Qué hace
 
-- **Clientes y proyectos**, con estados (contacto, propuesta, activo, terminado…), hitos con precio y fecha, horas y seguimiento de propuestas sin respuesta.
-- **Facturas** con numeración correlativa, IVA y retención de IRPF según el cliente (España, UE o fuera), PDF, cobros y rectificativas. Una factura emitida no se toca.
-- **Gastos** a partir del PDF o la foto de la factura: IVA deducible, inversión del sujeto pasivo para proveedores extranjeros, % de afectación, cambio de moneda del BCE y equipos por amortizar.
-- **Gastos fijos** (cuota de autónomos, suscripciones) con previsión mes a mes: qué ha llegado con factura y qué falta.
-- **Trimestres**: estimación del 303 y del 130, resumen en PDF, libros en Excel y un ZIP con todo para la gestoría. También un ZIP por mes.
-- **Espacios de cliente**: una página privada por propuesta o proyecto, escrita en Markdown, con sus hitos, facturas y archivos. Se entra con un enlace personal que puedes revocar cuando quieras. En el repo solo queda el hash de cada clave.
-- **"Lo que falta"**: el admin te dice qué tienes pendiente y qué decirle a Claude Code para resolverlo.
-- **El extracto del banco**: cruza el CSV con tus facturas y gastos, y te dice qué cobros cuadran y qué cargos no tienen factura.
+- **Clientes y proyectos**, con su estado, hitos con precio y fecha, horas y seguimiento de las propuestas que no contestan.
+- **Facturas** numeradas, con el IVA y la retención que tocan según el cliente (España, UE o fuera), su PDF, cobros y rectificativas. Una factura emitida no se puede cambiar, y GitHub lo comprueba en cada push.
+- **Gastos** a partir del PDF o la foto de la factura: IVA deducible, inversión del sujeto pasivo con proveedores extranjeros, porcentaje de uso profesional, cambio de moneda del BCE y equipos que se amortizan.
+- **Gastos del correo**: Claude Code busca en tu Gmail o tu Outlook las facturas nuevas de tus proveedores y las apunta. Si no quieres conectar el correo, las dejas en una carpeta.
+- **Gastos fijos** (cuota de autónomos, suscripciones), con lo que ha llegado este mes y lo que falta.
+- **Trimestres**: estimación del 303 y del 130, resumen en PDF, libros en Excel y un ZIP para la gestoría. También uno por mes.
+- **El extracto del banco**: lo cruza con tus facturas y gastos y te dice qué cobros cuadran y qué cargos no tienen factura.
+- **Espacios de cliente**: una página privada por propuesta o proyecto, escrita en Markdown, con sus hitos, facturas y archivos. Cada persona entra con su enlace, y puedes quitárselo cuando quieras.
+- **Melso**: si llevas los impuestos con [Melso](https://melso.ai), le manda tus facturas y gastos.
 
 | Espacio de un proyecto | Propuesta |
 |---|---|
@@ -25,15 +26,17 @@ Funciona en Cloudflare Pages y GitHub Actions, en sus planes gratuitos. No hay b
 
 ## Para quién es
 
-Para autónomos en España que ya usan [Claude Code](https://claude.com/claude-code) y se manejan con un repo de GitHub: desarrollo, diseño, consultoría, formación. La fiscalidad incluida es la española (IVA, IRPF, modelos 303 y 130, estimación directa simplificada).
+Para autónomos en España que ya usan [Claude Code](https://claude.com/claude-code) y tienen cuenta en GitHub: gente de desarrollo, diseño, consultoría o formación. No hace falta programar, pero sí no asustarse con una terminal. La fiscalidad es la española: IVA, IRPF, modelos 303 y 130 y estimación directa simplificada.
 
 ## Empezar
 
-1. Crea tu repo con **Use this template** en GitHub y hazlo **privado**: va a guardar tus datos fiscales y tus facturas.
-2. Clónalo, abre Claude Code dentro y dile: **«configura mi backoffice»**. Te pedirá tus datos, tu cuota de autónomos y tus suscripciones, y te enseñará el admin en local.
-3. Para publicarlo (admin y espacios de cliente en tu dominio), sigue [docs/instalar.md](docs/instalar.md). Son unos 20 minutos en Cloudflare.
+Necesitas Python 3.10 o superior, git, Google Chrome (para los PDF de las facturas) y Claude Code. Para publicarlo, también [gh](https://cli.github.com) y una cuenta de Cloudflare.
 
-Necesitas Python 3.10 o superior y Google Chrome (para los PDF). Nada más que instalar.
+1. En GitHub, **Use this template → Create a new repository**, y márcalo como **privado**: va a guardar tus datos fiscales y tus facturas.
+2. Clónalo, abre Claude Code dentro y dile **«configura mi backoffice»**. Te pedirá tus datos, tu cuota de autónomos y tus suscripciones, conectará el correo para los gastos si quieres y te enseñará el admin en tu ordenador.
+3. Para tenerlo en tu dominio, con los espacios de cliente: [docs/instalar.md](docs/instalar.md). Con `python backoffice.py cloudflare` es un comando y un par de clics.
+
+Para comprobar en cualquier momento que todo está en su sitio: `python backoffice.py doctor`.
 
 ### Probar con la demo
 
@@ -41,7 +44,7 @@ Necesitas Python 3.10 o superior y Google Chrome (para los PDF). Nada más que i
 BACKOFFICE_DATOS=demo python backoffice.py servir
 ```
 
-En PowerShell: `$env:BACKOFFICE_DATOS="demo"; python backoffice.py servir`. Abre el admin con los datos de una diseñadora inventada, Lucía Ferrer: tres clientes, facturas, gastos, un trimestre presentado y dos espacios.
+En PowerShell: `$env:BACKOFFICE_DATOS="demo"; python backoffice.py servir`. Se abre el admin con los datos de una diseñadora inventada, Lucía Ferrer: tres clientes, facturas, gastos, un trimestre presentado y dos espacios.
 
 ## Cómo se usa
 
@@ -49,29 +52,44 @@ Le hablas a Claude Code y él usa estas skills:
 
 | Skill | Le dices… |
 |---|---|
-| `configurar` | «configura mi backoffice» |
+| `configurar` | «configura mi backoffice», «configura los gastos del correo» |
 | `backoffice` | «nuevo cliente: …», «he terminado la Fase 1 de Acme», «hoy 3 h con Acme», «¿qué me deben?» |
 | `factura` | «factura a Acme la Fase 1», «me ha pagado Acme», «la 2026-004 está mal» |
-| `gasto` | «apunta este gasto» (con el PDF), «revisa el Gmail», «¿cuánto aparto este trimestre?», «cierra el 4T», «el ZIP de noviembre» |
+| `gasto` | «apunta este gasto» (con el PDF), «revisa los gastos del correo», «¿cuánto aparto este trimestre?», «cierra el 4T» |
 | `espacio` | «hazle una propuesta a Panadería Lola», «actualiza el espacio de Acme», «dale acceso a Ana» |
+| `melso` | «conecta Melso», «manda lo pendiente a Melso» |
+| `mantener` | «¿hay versión nueva?», «haz una copia de mis datos», «¿está todo bien?» |
 
-Cada cambio acaba en un commit. Al hacer `git push`, GitHub Actions publica el admin y los espacios.
+Cada cambio acaba en un commit, y con cada `git push` GitHub publica el admin y los espacios.
 
-Todo pasa por `python backoffice.py`, que también puedes usar a mano. Sin argumentos, lista los comandos. El formato de los datos está en [docs/datos.md](docs/datos.md).
+Debajo de todo está `python backoffice.py`, que también puedes usar a mano: sin argumentos, lista los comandos.
+
+## Documentación
+
+- [Publicar en Cloudflare](docs/instalar.md)
+- [Gastos del correo](docs/gastos-correo.md)
+- [Melso](docs/melso.md)
+- [Actualizar](docs/actualizar.md)
+- [Copias de seguridad](docs/copias.md)
+- [Si algo falla](docs/problemas.md)
+- [El formato de los datos](docs/datos.md)
+- [Cambios de cada versión](CHANGELOG.md)
 
 ## Seguridad
 
-- El repo tiene que ser privado.
-- `/admin/` está detrás de Cloudflare Access (login con tu email) y de una segunda comprobación en el servidor. Sin configurar, responde 403.
-- Cada espacio se abre solo con un enlace personal. La clave se enseña una vez y en el repo solo queda su SHA-256. Revocar un enlace no afecta a los demás.
+- El repo tiene que ser privado. `doctor` lo comprueba.
+- `/admin/` está detrás de Cloudflare Access (entras con tu email) y de una segunda comprobación en el servidor. Si falta configuración, responde 403: nunca queda abierto.
+- Cada espacio se abre solo con un enlace personal. La clave se enseña una vez y en el repo solo queda su SHA-256. Quitarle el enlace a alguien no afecta a los demás.
+- Claude Code no puede reescribir la historia de git ni editar a mano una factura emitida (`.claude/settings.json`), y GitHub rechaza la publicación si una factura emitida ha cambiado.
+- Los tokens (Cloudflare, GitHub) los escribes tú en la terminal. No pasan por el chat ni se guardan en el repo.
 - Todo se sirve con `noindex` y sin `Referer`.
 
 ## Aviso
 
-Freelance Backoffice es software libre que se ofrece tal cual, sin garantía (ver [LICENSE](LICENSE)). **No es asesoramiento fiscal ni contable.** Las cifras del 303 y el 130 son una estimación para revisarla con tu gestoría: no aplican prorrata, la deducción del art. 110.3.c, gastos de difícil justificación ni amortizaciones. Tú eres responsable de lo que facturas y de lo que presentas.
+Freelance Backoffice es software libre y se ofrece tal cual, sin garantía (ver [LICENSE](LICENSE)). **No es asesoramiento fiscal ni contable.** El 303 y el 130 que calcula son una estimación para revisarla con tu gestoría: no aplica prorrata, la deducción del art. 110.3.c, gastos de difícil justificación ni amortizaciones. Lo que facturas y lo que presentas es responsabilidad tuya.
 
-**Verifactu.** Freelance Backoffice no envía las facturas a la Agencia Tributaria ni las firma. Cuando el reglamento de sistemas de facturación te sea obligatorio (para autónomos está previsto desde julio de 2027), cumplirlo es responsabilidad tuya: tendrás que facturar con un sistema que lo cumpla.
+**Verifactu.** Freelance Backoffice no envía las facturas a la Agencia Tributaria ni las firma. Cuando el reglamento de sistemas de facturación te sea obligatorio (para autónomos está previsto desde julio de 2027), tendrás que facturar con un sistema que lo cumpla.
 
 ## Licencia
 
-MIT. Hecho por [Borja Pérez Francés](https://borjaperezfrances.com), que lleva así su propio negocio.
+MIT. Lo hace [Borja Pérez Francés](https://borjaperezfrances.com), que lleva así su propio negocio.

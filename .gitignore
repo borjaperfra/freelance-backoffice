@@ -6,3 +6,9 @@ node_modules/
 .DS_Store
 # Extractos del banco y borradores sueltos: nunca al repo
 *.csv
+# Lo de este ordenador: facturas por apuntar, respaldos de actualizar y ajustes locales
+bandeja/
+.actualizar/
+.backoffice.local.json
+datos-antes-de-restaurar-*/
+datos-restaurando/

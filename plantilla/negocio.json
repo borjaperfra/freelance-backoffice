@@ -1,4 +1,5 @@
 {
+  "version": 1,
   "nombre": "PENDIENTE",
   "nif": "PENDIENTE",
   "direccion": "PENDIENTE",
@@ -14,6 +15,12 @@
   "irpf_hasta": "",
   "vence_dias": 30,
   "dominio": "",
-  "gestoria": { "nombre": "", "email": "" },
-  "notas": ""
+  "gestoria": {
+    "nombre": "",
+    "email": ""
+  },
+  "notas": "",
+  "correo_gastos": "",
+  "email_gastos": "",
+  "no_apuntar": []
 }

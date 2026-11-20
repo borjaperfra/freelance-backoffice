@@ -21,6 +21,9 @@
     "desde": "2026-09",
     "banco": [
       "Adobe"
+    ],
+    "remitentes": [
+      "adobe.com"
     ]
   },
   {
@@ -32,6 +35,9 @@
     "base": 33.06,
     "afectacion": 50,
     "dia": 12,
-    "desde": "2026-09"
+    "desde": "2026-09",
+    "remitentes": [
+      "fibradeejemplo.es"
+    ]
   }
 ]

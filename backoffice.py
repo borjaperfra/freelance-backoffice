@@ -28,6 +28,18 @@ el admin (dist/sitio/admin/) y los espacios privados de cliente (dist/sitio/c/<s
     python backoffice.py enlace <espacio> "Nombre"   enlace personal a un espacio de cliente
     python backoffice.py revocar <espacio> "Nombre"  le quita el acceso
 
+    python backoffice.py correo [hecho]          qué buscar en el correo para los gastos; "hecho" apunta que ya está
+    python backoffice.py melso [pendiente]       lo que falta por mandar a Melso (ver docs/melso.md)
+
+    python backoffice.py doctor                  comprueba la instalación y dice cómo arreglar lo que falle
+    python backoffice.py actualizar [--comprobar]  trae la última versión del código (no toca datos/)
+    python backoffice.py migrar                  pone tus datos al día con la versión del código
+    python backoffice.py copia [carpeta]         ZIP con todos tus datos, fuera del repo
+    python backoffice.py restaurar <copia.zip>   recupera datos/ desde una copia
+    python backoffice.py cloudflare              publica en Cloudflare en un paso (ejecútalo tú, pide el token)
+    python backoffice.py proteger                protege main contra force-push (GitHub Pro en repos privados)
+    python backoffice.py version                 la versión del código y de tus datos
+
 Con BACKOFFICE_DATOS=demo usa los datos de ejemplo de demo/ en vez de datos/.
 
 Una factura emitida no se edita ni se borra: si está mal, se rectifica.
@@ -44,7 +56,11 @@ import subprocess
 import sys
 from decimal import ROUND_HALF_UP, Decimal
 
+VERSION = "0.2.0"      # la del código; actualizar la compara con la del repo original
+DATOS_VERSION = 1      # la del formato de datos/; si sube, hace falta una migración en mantenimiento.py
+
 ROOT = pathlib.Path(__file__).resolve().parent
+BANDEJA = ROOT / "bandeja"   # facturas de gastos sueltas, para apuntar (fuera de git)
 DATOS = (ROOT / os.environ.get("BACKOFFICE_DATOS", "datos")).resolve()
 WEB = ROOT / "web" / "admin"
 PLANTILLA_ESPACIO = ROOT / "web" / "espacio.html"
@@ -56,6 +72,10 @@ ESPACIOS = DATOS / "espacios"
 
 def chrome():
     """Chrome o Chromium para imprimir los PDF (facturas y resumen del trimestre)."""
+    return buscar_chrome() or sys.exit("No encuentro Chrome para generar el PDF. Instálalo o pon su ruta en la variable CHROME.")
+
+
+def buscar_chrome():
     if os.environ.get("CHROME") and pathlib.Path(os.environ["CHROME"]).exists():
         return os.environ["CHROME"]
     candidatos = [
@@ -70,7 +90,7 @@ def chrome():
     for nombre in ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser", "chrome"):
         if shutil.which(nombre):
             return shutil.which(nombre)
-    sys.exit("No encuentro Chrome para generar el PDF. Instálalo o pon su ruta en la variable CHROME.")
+    return None
 
 # Países de la UE (ISO 3166-1), sin España
 UE = set("AT BE BG CY CZ DE DK EE FI FR GR HR HU IE IT LT LU LV MT NL PL PT RO SE SI SK".split())
@@ -189,9 +209,18 @@ def calcular(conceptos, iva, irpf):
 
 # ---- Revisar ----
 
-def problemas():
-    """Lista de cosas que no cuadran en los datos. Vacía si todo está bien."""
+def problemas(desde="HEAD"):
+    """Lista de cosas que no cuadran en los datos. Vacía si todo está bien.
+
+    desde: commit con el que comparar las facturas emitidas (ninguna puede haber cambiado salvo su estado).
+    """
     errores = []
+    v = int(negocio().get("version", 0))
+    if v != DATOS_VERSION:
+        errores.append(f"tus datos son de la versión {v} y el código espera la {DATOS_VERSION}: python backoffice.py migrar"
+                       if v < DATOS_VERSION else
+                       f"tus datos son de la versión {v}, más nueva que el código ({DATOS_VERSION}): python backoffice.py actualizar")
+    errores += facturas_tocadas(desde)
     cls, prs, fas = clientes(), proyectos(), facturas()
     for slug, c in cls.items():
         if c.get("estado") not in ESTADOS_CLIENTE:
@@ -280,14 +309,116 @@ def problemas():
         if clave[1] and clave in vistos:
             errores.append(f"gasto {gid}: parece repetido con {vistos[clave]}")
         vistos[clave] = gid
+    errores += problemas_recurrentes()
+    return errores
+
+
+def problemas_recurrentes():
+    """Que recurrentes.json tenga la forma que espera "recurrentes" (si no, fallaría al apuntarlos)."""
+    if not RECURRENTES.exists():
+        return []
+    lista = leer(RECURRENTES)
+    if not isinstance(lista, list):
+        return ["recurrentes.json: tiene que ser una lista de gastos fijos (formato en docs/datos.md)"]
+    errores, ids = [], set()
+    for i, r in enumerate(lista):
+        nombre = r.get("id", f"#{i + 1}") if isinstance(r, dict) else f"#{i + 1}"
+        if not isinstance(r, dict):
+            errores.append(f"gasto fijo {nombre}: no es un objeto")
+            continue
+        faltan = [k for k in ("id", "proveedor", "concepto", "categoria", "tipo_iva", "base", "desde") if r.get(k) in (None, "")]
+        if faltan:
+            errores.append(f"gasto fijo {nombre}: le falta {', '.join(faltan)}")
+            continue
+        if r["id"] in ids:
+            errores.append(f"gasto fijo {nombre}: id repetido")
+        ids.add(r["id"])
+        if r["tipo_iva"] not in TIPOS_IVA:
+            errores.append(f"gasto fijo {nombre}: tipo_iva {r['tipo_iva']!r} no vale ({', '.join(TIPOS_IVA)})")
+        if r["categoria"] not in CATEGORIAS:
+            errores.append(f"gasto fijo {nombre}: categoría {r['categoria']!r} no vale")
+        if not isinstance(r["base"], (int, float)):
+            errores.append(f"gasto fijo {nombre}: base tiene que ser un número")
+        for k in ("desde", "hasta"):
+            if r.get(k) and not re.fullmatch(r"\d{4}-(0[1-9]|1[0-2])", str(r[k])):
+                errores.append(f"gasto fijo {nombre}: {k} tiene que ser AAAA-MM")
+        if "dia" in r and not (isinstance(r["dia"], int) and 1 <= r["dia"] <= 31):
+            errores.append(f"gasto fijo {nombre}: dia tiene que ser un número del 1 al 31")
+    return errores
+
+
+# Lo único que puede cambiar en una factura emitida: cobrarla, descobrarla o rectificarla.
+CAMBIOS_PERMITIDOS = {"estado", "cobrada", "rectificada_por"}
+
+
+def facturas_tocadas(desde="HEAD"):
+    """Facturas emitidas que han cambiado o desaparecido desde que se emitieron.
+
+    Compara cada factura de datos/facturas/<año>/ con la versión del commit en que entró en git, y
+    comprueba que sigue ahí todo lo que alguna vez entró. Así no basta con hacer otro push encima de
+    un cambio. Si además se pasa <desde> (en GitHub Actions, el commit anterior al push), tiene que
+    estar en el historial: si no está, alguien lo ha reescrito.
+    """
+    if not (ROOT / ".git").exists() or not shutil.which("git"):
+        return []
+    try:
+        carpeta = FACTURAS.relative_to(ROOT).as_posix()
+    except ValueError:
+        return []
+
+    def g(*args):
+        return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
+
+    errores = []
+    if g("rev-parse", "--is-shallow-repository").stdout.strip() == "true":
+        return ["el repo no tiene el historial completo y no puedo comprobar las facturas (en el workflow: fetch-depth: 0)"]
+    if desde and desde != "HEAD" and g("cat-file", "-e", f"{desde}^{{commit}}").returncode != 0:
+        errores.append(f"el commit {desde[:12]} no está en el historial: parece que se ha reescrito (force-push). "
+                       "Las facturas emitidas no se pueden comprobar así")
+
+    # Dónde entró cada factura: git log va de más nuevo a más viejo, así que gana el último que se ve.
+    log = g("log", "--diff-filter=A", "--no-renames", "--format=@@commit@@%H", "--name-only", "--", carpeta)
+    if log.returncode != 0:
+        return errores   # repo sin commits todavía
+    entro = {}
+    for bloque in log.stdout.split("@@commit@@")[1:]:
+        lineas = [l for l in bloque.splitlines() if l.strip()]
+        for ruta in lineas[1:]:
+            entro[ruta] = lineas[0]
+
+    for ruta, commit in sorted(entro.items()):
+        partes = pathlib.PurePosixPath(ruta).parts
+        if len(partes) < 2 or not partes[-2].isdigit():
+            continue  # borradores/
+        nombre, actual = partes[-1], ROOT / ruta
+        if not actual.exists():
+            errores.append(f"factura {nombre}: se ha borrado. Una factura emitida no se borra: se rectifica "
+                           f"(para recuperarla: git checkout {commit[:12]} -- {ruta})")
+        elif nombre.endswith(".json"):
+            try:
+                antes = json.loads(g("show", f"{commit}:{ruta}").stdout or "{}")
+            except json.JSONDecodeError:
+                continue
+            ahora = leer(actual)
+            tocado = sorted(k for k in set(antes) | set(ahora) if k not in CAMBIOS_PERMITIDOS and antes.get(k) != ahora.get(k))
+            if tocado:
+                errores.append(f"factura {nombre}: han cambiado {', '.join(tocado)}. Una factura emitida no se toca: se rectifica "
+                               f"(para deshacerlo: git checkout {commit[:12]} -- {ruta})")
+        elif nombre.endswith(".pdf"):
+            if g("rev-parse", f"{commit}:{ruta}").stdout.strip() != g("hash-object", ruta).stdout.strip():
+                errores.append(f"factura {nombre}: el PDF ha cambiado. Una factura emitida no se toca "
+                               f"(git checkout {commit[:12]} -- {ruta})")
     return errores
 
 
 def revisar():
-    errores = problemas()
+    desde = sys.argv[sys.argv.index("--desde") + 1] if "--desde" in sys.argv[:-1] else "HEAD"
+    if set(desde) == {"0"}:   # primer push de una rama en GitHub Actions
+        desde = None
+    errores = problemas(desde)
     for e in errores:
         print("  ✗", e)
-    print("Todo en orden" if not errores else f"{len(errores)} cosas que arreglar")
+    print("Todo en orden" if not errores else ("1 cosa que arreglar" if len(errores) == 1 else f"{len(errores)} cosas que arreglar"))
     return not errores
 
 
@@ -584,7 +715,9 @@ def registrar_gasto():
         shutil.copy2(archivo, destino / f"{gid}{archivo.suffix.lower()}")
         g["archivo"] = f"{gid}{archivo.suffix.lower()}"
     escribir(destino / f"{gid}.json", g)
-    print(f"Gasto {gid}: {g['proveedor']}, base {g['base']:.2f} €, IVA deducible {g['iva_deducible']:.2f} €, "
+    if archivo and BANDEJA.resolve() in archivo.resolve().parents:
+        archivo.unlink()   # apuntado: sale de la bandeja
+    print(f"Gasto {gid}:{g['proveedor']}, base {g['base']:.2f} €, IVA deducible {g['iva_deducible']:.2f} €, "
           f"gasto IRPF {g['gasto_irpf']:.2f} €")
     if g.get("cambio"):
         print(f"  {g['base_original']} {moneda} → {g['base']:.2f} € ({g['cambio']})")
@@ -601,6 +734,8 @@ def recurrentes():
     if not RECURRENTES.exists():
         print("No hay gastos fijos en datos/gastos/recurrentes.json")
         return
+    if errores := problemas_recurrentes():
+        sys.exit("No puedo apuntar los gastos fijos:\n  " + "\n  ".join(errores))
     hechos = {(g.get("recurrente"), g["fecha"][:7]) for g in gastos().values()}
     neg, nuevos = negocio(), 0
     for r in leer(RECURRENTES):
@@ -1246,7 +1381,7 @@ def pendientes(neg):
                     "pide": "mi cuota de autónomos es … € al mes"})
     for g in gastos().values():
         if not g.get("archivo") and not g.get("sin_factura"):
-            out.append({"texto": f"Falta la factura de {g['proveedor']} del {fecha_corta(g['fecha'])} ({g['base']:.2f} €).",
+            out.append({"texto": f"Falta la factura de {g['proveedor']} del {fecha_corta(g['fecha'])} ({eur_es(g['base'])}).",
                         "pide": "aquí va la factura de …"})
     # Plazo de presentación: el trimestre anterior, si estamos dentro de su plazo y no está presentado
     ini_actual = limites(trimestre_de(hoy()))[0]
@@ -1272,6 +1407,15 @@ def pendientes(neg):
                 nombre = cls.get(p["cliente"], {}).get("nombre", p["cliente"])
                 out.append({"texto": f"{nombre}: {dias} días sin respuesta a la propuesta.",
                             "pide": f"prepárame un seguimiento para {nombre}"})
+    # Correo de gastos, Melso y copias
+    import conectores
+    out += [a for a in (conectores.aviso_correo(neg), conectores.aviso_melso()) if a]
+    if facturas() and not neg.get("demo"):
+        ultima = (leer(DATOS / "copias.json") if (DATOS / "copias.json").exists() else {}).get("ultima")
+        dias = (fecha(hoy()) - fecha(ultima)).days if ultima else None
+        if dias is None or dias > 35:
+            out.append({"texto": "No hay ninguna copia de tus datos fuera de GitHub." if dias is None else
+                        f"Tu última copia de seguridad es de hace {dias} días.", "pide": "haz una copia de mis datos"})
     return out
 
 
@@ -1504,6 +1648,8 @@ def build_sitio():
     (SITIO / "_headers").write_text(
         "/*\n  X-Robots-Tag: noindex, nofollow, noarchive\n  Referrer-Policy: no-referrer\n  X-Content-Type-Options: nosniff\n",
         encoding="utf-8")
+    # El admin solo puede quedar abierto (DEMO = "1") si los datos son los de la demo
+    escribir(ROOT / "dist" / "modo.json", {"demo": negocio().get("demo") is True})
     # La cerradura de /c/ solo necesita los hashes: {slug: {hash: nombre}}
     escribir(ROOT / "dist" / "accesos.json",
              {k: {a["hash"]: a["nombre"] for a in lista} for k, lista in accesos().items() if k in hechos})
@@ -1617,8 +1763,11 @@ def servidor(directorio, puerto=0):
 
 
 def pdf_factura(numero=None):
-    """Imprime factura.html con Chrome. Sin número, rehace todas."""
-    numeros = [numero] if numero else list(facturas())
+    """Imprime factura.html con Chrome. Sin número, las que no tienen PDF."""
+    numeros = [numero] if numero else [n for n in facturas() if not ruta_factura(n).with_suffix(".pdf").exists()]
+    if not numeros:
+        print("Todas las facturas tienen su PDF.")
+        return
     tmp = build(ROOT / "dist" / "admin-pdf")
     server = servidor(tmp)
     try:
@@ -1659,16 +1808,28 @@ def servir():
 
 
 if __name__ == "__main__":
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
+    for flujo in (sys.stdout, sys.stderr):
+        if hasattr(flujo, "reconfigure"):
+            flujo.reconfigure(encoding="utf-8")
+    import conectores
+    import mantenimiento
+
+    def version():
+        v = negocio().get("version", 0) if (DATOS / "negocio.json").exists() else "sin datos"
+        print(f"Freelance Backoffice {VERSION} · datos en la versión {v} (el código espera la {DATOS_VERSION})")
+
     tareas = {"init": init, "build": build_sitio, "servir": servir, "enlace": enlace, "revocar": revocar, "revisar": revisar, "emitir": emitir, "cobrar": cobrar,
               "rectificar": rectificar, "pdf": pdf, "resumen": resumen, "gasto": registrar_gasto,
               "recurrentes": recurrentes, "trimestre": trimestre, "presentado": presentado,
-              "banco": banco, "semana": semana, "mes": mes}
+              "banco": banco, "semana": semana, "mes": mes,
+              "correo": conectores.correo, "melso": conectores.melso,
+              "doctor": mantenimiento.doctor, "actualizar": mantenimiento.actualizar, "migrar": mantenimiento.migrar,
+              "copia": mantenimiento.copia, "restaurar": mantenimiento.restaurar, "cloudflare": mantenimiento.cloudflare,
+              "proteger": mantenimiento.proteger, "wrangler": mantenimiento.wrangler, "version": version}
     tarea = tareas.get(sys.argv[1] if len(sys.argv) > 1 else "")
     if not tarea:
         print(__doc__)
-    elif tarea is revisar:
-        sys.exit(0 if revisar() else 1)
+    elif tarea in (revisar, mantenimiento.doctor):
+        sys.exit(0 if tarea() else 1)
     else:
         tarea()

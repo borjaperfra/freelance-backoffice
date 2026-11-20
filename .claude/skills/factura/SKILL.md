@@ -45,8 +45,8 @@ Habla con la persona en su idioma y corto.
 Nunca envíes: crea un **borrador** en Gmail (`create_draft`) para que la persona lo revise y le dé a enviar.
 
 - Para: el `email_facturas` del cliente (con copia al contacto si la persona lo pide).
-- Asunto: `Factura <número> · la persona Pérez`.
-- Cuerpo corto, en la voz de la persona (`datos/voz.md`, si existe): qué se factura, el total, el vencimiento y el IBAN. Sin frases de folleto. Firma "la persona".
+- Asunto: `Factura <número> · <nombre de negocio.json>`.
+- Cuerpo corto, en la voz de la persona (`datos/voz.md`, si existe): qué se factura, el total, el vencimiento y el IBAN. Sin frases de folleto. Firma con el nombre de la persona.
 - Adjunto: el PDF. Calcula su hash (`python -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" <pdf>`) y pásalo como `content: "sha256:<hash>:<ruta absoluta con />"`, `filename: "<número>.pdf"`, `mimeType: "application/pdf"`.
 
 Dile que lo tiene en borradores y dale el enlace.

@@ -17,7 +17,13 @@ Tus datos fiscales. Salen en cada factura.
 | `vence_dias` | Días para pagar una factura (30 por defecto) |
 | `dominio` | `https://…` donde publicas; sirve para escribir los enlaces de los espacios |
 | `gestoria` | `{nombre, email}`: a quién van los ZIP del mes y del trimestre |
-| `email_gastos`, `no_apuntar` | Opcionales: tu buzón de facturas y proveedores que no quieres apuntar |
+| `version` | La versión del formato de tus datos. La pone `backoffice.py`; no la cambies a mano |
+| `correo_gastos` | De dónde salen los gastos: `gmail`, `outlook` o `bandeja` (ver [gastos-correo.md](gastos-correo.md)) |
+| `email_gastos`, `etiqueta_gastos` | Opcionales: tu buzón o etiqueta de facturas |
+| `no_apuntar` | Proveedores que no se apuntan nunca |
+| `revisar_correo_dias` | Cada cuántos días te recuerda revisar el correo (14) |
+| `pages_dev` | Tu dirección `*.pages.dev`. La apunta `python backoffice.py cloudflare` |
+| `demo` | `true` solo en los datos de `demo/` |
 
 ## clientes/<slug>.json
 
@@ -87,7 +93,7 @@ Cada gasto con su factura al lado (`<id>.pdf` o `.jpg`). Los crea `python backof
 
 ## gastos/recurrentes.json
 
-Los gastos fijos de cada mes. `python backoffice.py recurrentes` apunta los que falten.
+Los gastos fijos de cada mes. `python backoffice.py recurrentes` apunta los que falten. Cada uno puede llevar `remitentes` (dominios desde los que llega su factura por correo) y `banco` (cómo aparece en el extracto).
 
 ## trimestres/<2026-4T>/
 
@@ -97,7 +103,7 @@ El resumen PDF y los libros en Excel de cada trimestre cerrado (`python backoffi
 
 - **Clientes:** `pro_bono` (true: no se le factura; no pide datos fiscales en «Lo que falta»).
 - **Proyectos:** `pro_bono` (true: no se factura), `enlaces` (`[{nombre, url}]`, enlaces útiles; salen en la ficha del proyecto), `horas` (`[{fecha, horas, nota}]`), `horas_semana` (dedicación pactada), `enviada` y `ultimo_contacto` (AAAA-MM-DD) y `seguimiento_dias` (7 por defecto) para avisar de propuestas sin respuesta.
-- **Gastos:** `gmail_id` si salió de un email (evita apuntarlo dos veces).
+- **Gastos:** `gmail_id` si salió de un email (evita apuntarlo dos veces) y `remitente`, el dominio desde el que llegó.
 - **Gastos fijos:** `banco`, lista de textos con los que aparece el cargo en el extracto ("Adobe", "Google *Workspace"…).
 - **facturas/borradores/<slug>.json:** facturas preparadas sin emitir, con el formato del borrador de `emitir`. Se borran solas al emitirlas.
 
@@ -108,3 +114,15 @@ Un espacio privado para un cliente: cabecera `clave: valor` y el texto en Markdo
 ## espacios/accesos.json
 
 Quién entra en cada espacio: `{slug: [{nombre, hash, creado}]}`. Lo escriben `python backoffice.py enlace` y `revocar`. Solo guarda el SHA-256 de cada clave.
+
+## gastos/revision.json
+
+`{"ultima": "AAAA-MM-DD"}`: cuándo se revisaron por última vez las facturas del correo. Lo escribe `python backoffice.py correo hecho`.
+
+## copias.json
+
+`{"ultima": "AAAA-MM-DD", "archivos": n}`: la última copia de seguridad. Lo escribe `python backoffice.py copia` (ver [copias.md](copias.md)).
+
+## melso.json
+
+Solo si usas Melso: desde qué fecha se le manda todo y qué facturas, gastos y cobros se le han mandado ya, con su id en Melso. Ver [melso.md](melso.md).

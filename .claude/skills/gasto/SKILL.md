@@ -62,18 +62,26 @@ El % del gasto que es del negocio. 100 por defecto. Teléfono, fibra o algo que 
 - No edites a mano las cifras de un gasto ya apuntado. Si está mal, borra su `.json` y su archivo de `datos/gastos/<año>/` y apúntalo otra vez.
 - Un equipo de más de 300 € (ordenador, cámara…) se apunta normal con `categoria: "equipo"`: el script lo deja aparte para que la gestoría lo amortice.
 
-## "Revisa el Gmail" (o el correo que use)
+## "Revisa los gastos del correo"
 
-Si la persona tiene un conector de correo (Gmail) en Claude, cuando diga "revisa los gastos" o "revisa el Gmail":
+Cuando diga "revisa los gastos", "revisa el Gmail" o "apunta lo de la bandeja". Si `correo_gastos` no está en `negocio.json`, es que no se ha configurado: hazlo antes con la skill `configurar` (paso 3).
 
-1. Busca las facturas recientes de sus proveedores: los de `recurrentes.json` y los de `datos/gastos/`, y su buzón de facturas si tiene uno (lo pone en `negocio.json`, `email_gastos`). Por ejemplo `(from:(stripe.com OR adobe.com) OR to:<email_gastos>) (receipt OR recibo OR invoice OR factura) newer_than:45d`. Solo lo emitido desde el alta (`alta` en `negocio.json`).
-2. Descarta los que ya están apuntados: cada gasto apuntado desde el correo guarda su `gmail_id`. Mira con `grep -r "<id>" datos/gastos`.
-3. Por cada uno nuevo: `get_message` para ver adjuntos y descarga el PDF de la **factura** (en Stripe hay dos: `Invoice-…pdf` es la factura, `Receipt-…pdf` el recibo; quédate con la factura). Léelo y apúntalo como siempre, con `"gmail_id": "<id del mensaje>"` en el borrador.
+Empieza con `python backoffice.py correo`: te da la búsqueda exacta (`busqueda_gmail`, hecha con los `remitentes` de los gastos fijos, `email_gastos`, `etiqueta_gastos`, la fecha de alta y `no_apuntar`), los ids de correo ya apuntados y los archivos que hay en la bandeja.
+
+**Si es la bandeja** (`correo_gastos: "bandeja"`, o hay archivos en `bandeja/`): lee cada archivo y apúntalo con `python backoffice.py gasto <borrador.json> bandeja/<archivo>`. Al apuntarlo, el archivo sale de la bandeja solo.
+
+**Si es Gmail u Outlook:**
+
+1. Haz la búsqueda. En Outlook, tradúcela a su sintaxis (remitentes, adjuntos y fechas).
+2. Descarta los mensajes cuyo id está en `ya_apuntados`.
+3. Por cada uno nuevo: `get_message` para ver adjuntos y descarga el PDF de la **factura** (en Stripe hay dos: `Invoice-…pdf` es la factura, `Receipt-…pdf` el recibo; quédate con la factura). Léelo y apúntalo como siempre, con `"gmail_id": "<id del mensaje>"` y `"remitente": "<dominio del remitente>"` en el borrador. Así la siguiente búsqueda ya lo incluye.
    Si la descarga de adjuntos no está permitida en su organización, pide el mensaje con `get_message` y `messageFormat: RAW`: el resultado se guarda en un archivo JSON y `python -I adjuntos.py <ese archivo> <carpeta del scratchpad>` saca los PDF.
 4. Si ese mes había un gasto fijo aproximado del mismo proveedor (sin `archivo`, con `recurrente`), bórralo antes de apuntar el real.
 5. Lo que no sea del negocio (supermercado, ocio, suministros que no quiera deducir), ignóralo sin preguntar. Si dudas, pregunta con una lista corta. Si la persona te dice que un proveedor no se apunta nunca, guárdalo en `negocio.json`, `no_apuntar`, y respétalo.
 
-Al final, una tabla: proveedor, fecha, base, qué has hecho.
+Al final, una tabla: proveedor, fecha, base, qué has hecho. Y `python backoffice.py correo hecho`, para que el admin sepa cuándo fue la última revisión.
+
+Si un proveedor nuevo va a repetirse cada mes, propón añadirlo a `recurrentes.json` con su dominio en `remitentes`.
 
 ### La previsión de gastos fijos
 
@@ -103,6 +111,8 @@ Están en `datos/gastos/recurrentes.json`:
 ```
 
 - `dia` (opcional) es el día del mes; sin él, el último. `hasta` (opcional, `AAAA-MM`) para cuando se acabe.
+- `remitentes` (opcional): dominios desde los que llega su factura por correo (`["adobe.com"]`). Con ellos, «revisa los gastos» la encuentra.
+- `banco` (opcional): textos con los que aparece el cargo en el extracto.
 - `sin_factura: true` solo para lo que no tiene factura (la cuota de autónomos, comisiones del banco). Las suscripciones sí tienen factura: no lo pongas, y cada mes saldrá en "Lo que falta" hasta que la persona te pase la factura. Entonces borra el gasto generado y apúntalo con su factura.
 - Después de añadir uno, y antes de cerrar un trimestre: `python backoffice.py recurrentes`.
 
@@ -126,6 +136,8 @@ Cuando diga "cierra el 4T" o "prepara lo de la gestoría":
 4. `python backoffice.py trimestre 2026-4T`. Genera en `datos/trimestres/2026-4T/` el resumen PDF y los libros en Excel, y en `dist/trimestres/gestoria-2026-4T.zip` todo junto con las facturas.
 5. Lee el resumen PDF y dale a la persona: lo que sale a pagar del 303 y del 130, los avisos, y la ruta del ZIP para mandárselo a la gestoría.
 6. Publica (ver abajo).
+
+7. Propón una copia de seguridad (`python backoffice.py copia`, skill `mantener`). Si usa Melso (`datos/melso.json`), manda antes lo pendiente (skill `melso`).
 
 Cuando diga que la gestoría ya lo ha presentado: `python backoffice.py presentado 2026-4T` y publica.
 

@@ -8,7 +8,10 @@
 //
 // Las variables están en wrangler.toml.
 //
-// Con DEMO = "1" el admin queda abierto: solo para publicar la demo con datos inventados.
+// Con DEMO = "1" el admin queda abierto, pero solo si los datos publicados son los de la demo
+// ("demo": true en negocio.json, que build deja en dist/modo.json). Con datos reales, DEMO no hace nada.
+
+import MODO from '../../dist/modo.json';
 
 let claves = { team: null, hasta: 0, keys: [] };
 
@@ -51,8 +54,8 @@ const fuera = (motivo) => new Response(`403 · ${motivo}\n`, {
 });
 
 export async function onRequest({ request, env, next }) {
-  if (env.DEMO === '1') return cabeceras(await next());
-  if (!env.ACCESS_TEAM || !env.ACCESS_AUD || !env.ADMIN_EMAIL) return fuera('Falta configurar Access en wrangler.toml');
+  if (env.DEMO === '1' && MODO.demo === true) return cabeceras(await next());
+  if (!env.ACCESS_TEAM || !env.ACCESS_AUD || !env.ADMIN_EMAIL) return fuera('Falta configurar Access (variables ACCESS_TEAM, ACCESS_AUD y ADMIN_EMAIL en GitHub)');
 
   const cookie = (request.headers.get('cookie') || '').match(/(?:^|;\s*)CF_Authorization=([^;]+)/);
   const token = request.headers.get('cf-access-jwt-assertion') || (cookie && cookie[1]);
