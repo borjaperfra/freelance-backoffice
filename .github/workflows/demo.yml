@@ -1,0 +1,58 @@
+# Publica la demo (los datos inventados de demo/) con el admin y los espacios abiertos.
+# Solo corre en el repo original: en los repos creados desde la plantilla no hace nada.
+#
+# Necesita en el repo original:
+#   Secrets:   CLOUDFLARE_API_TOKEN (solo Cloudflare Pages: Edit), CLOUDFLARE_ACCOUNT_ID
+#   Variable:  DEMO_PROYECTO (opcional; por defecto freelance-backoffice-demo)
+
+name: Demo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: demo
+  cancel-in-progress: true
+
+jobs:
+  demo:
+    if: github.repository == 'borjaperfra/freelance-backoffice'
+    runs-on: ubuntu-latest
+    env:
+      BACKOFFICE_DATOS: demo
+      PROYECTO: ${{ vars.DEMO_PROYECTO || 'freelance-backoffice-demo' }}
+      DEMO: '1'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Revisar la demo
+        run: python backoffice.py revisar
+
+      - name: Montar el sitio
+        run: python backoffice.py build
+
+      - name: Configuración (DEMO = 1)
+        run: python backoffice.py wrangler
+
+      - name: Crear el proyecto de Pages
+        continue-on-error: true
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '3.114.0'
+          command: pages project create ${{ env.PROYECTO }} --production-branch=main
+
+      - name: Desplegar
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '3.114.0'
+          command: pages deploy --project-name=${{ env.PROYECTO }} --branch=main --commit-hash=${{ github.sha }}
