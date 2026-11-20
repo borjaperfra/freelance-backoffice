@@ -45,7 +45,7 @@ En una terminal, en la carpeta del repo (no en el chat de Claude Code):
 python backoffice.py cloudflare
 ```
 
-Te pide el token sin enseñarlo y hace lo demás: crea el proyecto de Pages, le pone tu dominio, crea el registro DNS, protege `/admin` con Cloudflare Access para tu email y guarda en GitHub los secretos y variables que necesita la publicación. Al final te pide un segundo token para GitHub, con un solo permiso (**Account · Cloudflare Pages · Edit**). Es el que se queda guardado en GitHub para publicar; si algún día se filtrara, no daría acceso a tu Access ni a tu DNS. Puedes darle a Enter y usar el mismo, pero no es lo recomendable.
+Te pide que copies el token (con el botón de copiar de Cloudflare) y pulses Enter: lo lee del portapapeles, lo borra de allí y hace lo demás. No hace falta pegarlo, y nunca lo pegues en la terminal ni en el chat. Después: crea el proyecto de Pages, le pone tu dominio, crea el registro DNS, protege `/admin` con Cloudflare Access para tu email y guarda en GitHub los secretos y variables que necesita la publicación. Al final te pide un segundo token para GitHub, con un solo permiso (**Account · Cloudflare Pages · Edit**). Es el que se queda guardado en GitHub para publicar; si algún día se filtrara, no daría acceso a tu Access ni a tu DNS. Si no copias otro y pulsas Enter, usa el mismo, pero no es lo recomendable.
 
 Si algo falla, te dice qué, y puedes volver a lanzarlo: lo que ya está hecho no se repite.
 

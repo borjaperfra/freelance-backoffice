@@ -452,10 +452,41 @@ class Cloudflare:
             raise SystemExit(f"No llego a Cloudflare ({e}). Mira tu conexión y vuelve a lanzarlo.")
 
 
-def leer_token(pregunta):
+def leer_token(pregunta, otro_igual=""):
+    """Lee un token del portapapeles (copias y pulsas Enter) y lo borra de allí. Si no se puede, lo pide oculto.
+
+    Pegar en una entrada oculta falla en algunas terminales de Windows; leer el portapapeles, no.
+    otro_igual: un token ya leído; si el portapapeles sigue vacío o igual, se usa ese.
+    """
+    try:
+        import tkinter
+        raiz = tkinter.Tk()
+        raiz.withdraw()
+    except Exception:
+        raiz = None
+    if raiz is not None:
+        try:
+            if otro_igual:
+                input(f"{pregunta}\n  Copia el otro token y pulsa Enter (o pulsa Enter sin copiar nada para usar el mismo): ")
+            else:
+                input(f"{pregunta}\n  Copia el token (botón de copiar de Cloudflare) y pulsa Enter aquí: ")
+            try:
+                leido = raiz.clipboard_get().strip()
+            except tkinter.TclError:
+                leido = ""
+            if leido and leido != otro_igual:
+                raiz.clipboard_clear()   # que no se quede en el portapapeles
+                raiz.update()
+                print(f"  Leído del portapapeles ({len(leido)} caracteres) y borrado de allí.")
+                return leido
+            if otro_igual:
+                print("  Uso el mismo token.")
+                return ""
+            print("  El portapapeles está vacío. Pégalo aquí (no se verá):")
+        finally:
+            raiz.destroy()
     import getpass
-    print("  (En Windows, pega con clic derecho o Ctrl+Shift+V: Ctrl+V a veces no pega aquí.)")
-    return getpass.getpass(pregunta).strip()
+    return getpass.getpass(f"{pregunta} ").strip()
 
 
 def revisar_token(token):
@@ -491,7 +522,7 @@ def cloudflare():
         if not sys.stdin.isatty():
             sys.exit("Ejecuta este comando tú, en una terminal: python backoffice.py cloudflare\n"
                      "Te pedirá el token de Cloudflare sin que pase por el chat.")
-        token = leer_token("Token de Cloudflare (no se ve al escribirlo): ")
+        token = leer_token("Token de Cloudflare.")
     revisar_token(token)
     cf = Cloudflare(token)
     if cf("GET", "/user/tokens/verify", permitir=(400,)).get("_codigo") == 400:
@@ -578,7 +609,7 @@ def cloudflare():
     if not publicar and sys.stdin.isatty():
         import getpass
         print("\nPara GitHub conviene un token aparte con un solo permiso: Account · Cloudflare Pages · Edit.")
-        publicar = leer_token("Token para GitHub (Enter para usar el mismo de antes): ")
+        publicar = leer_token("Token para GitHub (solo con permiso de Pages).", otro_igual=token)
     if publicar and publicar != token:
         revisar_token(publicar)
         Cloudflare(publicar)("GET", "/user/tokens/verify")
